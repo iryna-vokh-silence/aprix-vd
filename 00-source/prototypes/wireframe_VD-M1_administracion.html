@@ -1,0 +1,1242 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Aprix VD · Administración</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  --brand:#81001E; --brand-soft:#FDECEF; --brand-mid:#B3334E;
+  --side:#262626; --side-hover:#333333; --side-text:#F2F2F2; --side-muted:#A3A3A3;
+  --text:#1A1A1A; --muted:#6B6B6B; --faint:#9A9A9A;
+  --border:#E5E5E5; --border-strong:#D4D4D4; --head:#F5F5F5; --row-alt:#FAFAFA; --bg:#FFFFFF; --page:#FFFFFF;
+  --dark:#1F1F1F; --dark-hover:#333;
+  --green:#166534; --green-bg:#ECFDF3; --green-bd:#ABEFC6;
+  --amber:#854D0E; --amber-bg:#FFFBEC; --amber-bd:#F5D98B;
+  --info:#0369A1; --info-bg:#F1F9FF; --info-bd:#B9E6FE;
+  --red:#B42318; --red-bg:#FEF3F2; --red-bd:#FECDCA;
+  --grey:#525252; --grey-bg:#F2F2F2;
+  --radius:8px; --radius-sm:6px;
+  --font:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{height:100%}
+body{margin:0;background:var(--page);color:var(--text);font-family:var(--font);font-size:14px;line-height:1.45;-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font-family:inherit;font-size:inherit;color:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,[tabindex]:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+::placeholder{color:var(--faint)}
+h1,h2,h3,h4{margin:0;text-wrap:balance}
+.tnum{font-variant-numeric:tabular-nums}
+
+/* ---------- demo bar ---------- */
+.demobar{position:sticky;top:0;z-index:60;display:flex;align-items:center;gap:14px;flex-wrap:wrap;padding:8px 16px;background:#111;color:#E5E5E5;font-size:12px;border-bottom:1px solid #333}
+.demobar .tag{background:var(--brand);color:#fff;font-weight:600;padding:2px 8px;border-radius:4px;letter-spacing:.02em}
+.demobar .grow{flex:1}
+.demobar label{display:flex;align-items:center;gap:6px;color:#BDBDBD}
+.demobar select{background:#222;color:#fff;border:1px solid #444;border-radius:4px;padding:3px 8px;font-size:12px}
+.demobar button{background:#222;color:#fff;border:1px solid #444;border-radius:4px;padding:3px 10px;font-size:12px}
+.demobar button:hover{background:#333}
+.demobar .sw{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.demobar .sw i{width:28px;height:16px;border-radius:9px;background:#444;position:relative;transition:background .15s}
+.demobar .sw i::after{content:"";position:absolute;top:2px;left:2px;width:12px;height:12px;border-radius:50%;background:#fff;transition:left .15s}
+.demobar .sw.on i{background:var(--brand)}
+.demobar .sw.on i::after{left:14px}
+
+/* ---------- app shell ---------- */
+.app{display:flex;min-height:calc(100vh - 34px);background:var(--page)}
+.sidebar{width:272px;flex:0 0 272px;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;position:sticky;top:34px;height:calc(100vh - 34px);overflow:auto}
+.sb-top{display:flex;align-items:center;gap:10px;padding:16px 16px 10px}
+.sb-logo{width:40px;height:40px;border-radius:8px;background:#3A3A3A}
+.sb-brandbar{height:40px;flex:1;border-radius:8px;background:#3A3A3A}
+.sb-collapse{width:32px;height:32px;border:0;background:transparent;color:#BDBDBD;display:grid;place-items:center;border-radius:6px}
+.sb-collapse:hover{background:var(--side-hover)}
+.nav{padding:6px 12px;display:flex;flex-direction:column;gap:2px;flex:1}
+.nav-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:6px;color:var(--side-text);border:0;background:transparent;text-align:left;width:100%;font-size:15px}
+.nav-item:hover{background:var(--side-hover)}
+.nav-item .ic{width:20px;height:20px;flex:0 0 20px;display:grid;place-items:center;color:#D4D4D4}
+.nav-item .lbl{flex:1}
+.nav-item .chev{color:#BDBDBD;transition:transform .15s}
+.nav-item.open .chev{transform:rotate(90deg)}
+.nav-item.active{background:var(--brand);color:#fff;font-weight:600}
+.nav-item.active .ic,.nav-item.active .chev{color:#fff}
+.nav-item.disabled{opacity:.45;cursor:not-allowed}
+.nav-sub{display:flex;flex-direction:column;gap:2px;padding:2px 0 6px 0}
+.nav-sub .nav-item{padding:9px 12px 9px 44px;font-size:14px}
+.nav-sub .nav-item.active{background:var(--brand)}
+.nav-sec{padding:10px 12px 4px 44px;font-size:10.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--side-muted)}
+.nav-sub .nav-item .hu{font-size:10px;color:var(--side-muted);border:1px solid #4A4A4A;border-radius:4px;padding:0 5px;margin-left:auto}
+.nav-item.active .hu{color:#fff;border-color:rgba(255,255,255,.5)}
+.nav-item.soon .hu{border:0;color:#8A8A8A;font-style:italic}
+.sb-bottom{padding:12px 16px 14px}
+.usercard{display:flex;align-items:center;gap:10px;background:#3A3A3A;border-radius:8px;padding:12px 14px}
+.usercard .nm{font-weight:600;font-size:14px}
+.usercard .rl{font-size:12px;color:#BDBDBD}
+.usercard .out{margin-left:auto;color:#D4D4D4;display:grid;place-items:center}
+.release{font-size:11px;color:#8A8A8A;margin-top:10px}
+
+.main{flex:1;min-width:0;padding:28px 36px 60px;background:var(--page)}
+.crumb{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:14px;margin-bottom:14px}
+.crumb .home{display:inline-grid;place-items:center;color:var(--muted)}
+.crumb .sep{color:#C4C4C4}
+.crumb .cur{color:var(--text)}
+.pagehead{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;margin-bottom:22px}
+.pagehead h1{font-size:34px;font-weight:700;letter-spacing:-.01em;line-height:1.15}
+.pagehead .sub{color:var(--muted);font-size:15px;margin-top:6px;max-width:80ch}
+.pagehead .actions{display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:10px 16px;border-radius:8px;border:1px solid transparent;font-weight:500;font-size:14px;line-height:1.2;white-space:nowrap;transition:background .12s,color .12s,border-color .12s}
+.btn.primary{background:var(--dark);color:#fff}
+.btn.primary:hover{background:var(--dark-hover)}
+.btn.brand{background:var(--brand);color:#fff}
+.btn.brand:hover{background:#6A0019}
+.btn.light{background:var(--grey-bg);color:var(--text)}
+.btn.light:hover{background:#E8E8E8}
+.btn.ghost{background:transparent;border-color:var(--border-strong);color:var(--text)}
+.btn.ghost:hover{background:var(--head)}
+.btn.link{background:transparent;color:var(--brand);padding:6px 8px;font-weight:600}
+.btn.link:hover{background:var(--brand-soft)}
+.btn.danger-link{background:transparent;color:var(--red);padding:6px 8px;font-weight:600}
+.btn.danger-link:hover{background:var(--red-bg)}
+.btn.sm{padding:6px 12px;font-size:13px;border-radius:6px}
+.btn.xs{padding:4px 10px;font-size:12px;border-radius:6px}
+.btn.pill{border:1px solid var(--red-bd);color:var(--red);background:#fff;padding:5px 10px;border-radius:6px;font-weight:500;font-size:13px}
+.btn.pill:hover{background:var(--red-bg)}
+.btn.pill.ok{border-color:var(--green-bd);color:var(--green)}
+.btn.pill.ok:hover{background:var(--green-bg)}
+.btn.pill.neutral{border-color:var(--border-strong);color:var(--text)}
+.btn.pill.neutral:hover{background:var(--head)}
+.btn.icon{padding:9px;width:40px;height:40px;justify-content:center}
+.btn[disabled],.btn.disabled{opacity:.45;cursor:not-allowed}
+.btn[disabled]:hover{background:inherit}
+
+/* ---------- cards / layout ---------- */
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--radius)}
+.card-h{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;border-bottom:1px solid var(--border);font-size:16px;font-weight:500}
+.card-h .meta{font-size:13.5px;color:var(--muted);font-weight:400}
+.card-b{padding:20px}
+.grid{display:grid;gap:20px}
+.g-2{grid-template-columns:1fr 1fr}
+.g-side{grid-template-columns:320px 1fr}
+.g-side-r{grid-template-columns:1fr 360px}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-bottom:22px}
+.kpi{border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px 16px;background:#fff}
+.kpi .k{font-size:11.5px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.kpi .v{font-size:24px;font-weight:600;margin-top:8px;letter-spacing:-.01em}
+.kpi .s{font-size:13px;color:var(--muted);margin-top:4px}
+.kpi.hl{border-color:var(--brand)}
+.kpi.hl .k{color:var(--brand)}
+.stack{display:flex;flex-direction:column;gap:20px}
+.row{display:flex;align-items:center;gap:12px}
+.row.between{justify-content:space-between}
+.row.wrap{flex-wrap:wrap}
+.spacer{flex:1}
+.mt{margin-top:16px}.mb{margin-bottom:16px}
+.muted{color:var(--muted)}.small{font-size:13px}.xs{font-size:12px}
+.b{font-weight:600}
+
+/* toolbar */
+.toolbar{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+.search{display:flex;align-items:center;gap:10px;border:1px solid var(--border);border-radius:8px;padding:0 14px;height:44px;flex:0 0 420px;background:#fff}
+.search input{border:0;outline:0;flex:1;font-size:15px;background:transparent}
+.search svg{color:var(--muted)}
+.count{color:var(--muted);font-size:15px}
+.segment{display:inline-flex;background:var(--grey-bg);border-radius:8px;padding:4px}
+.segment button{border:0;background:transparent;padding:7px 14px;border-radius:6px;font-weight:500;color:var(--muted)}
+.segment button.on{background:var(--dark);color:#fff}
+
+/* tabs */
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--border);margin-bottom:20px}
+.tab{border:0;background:transparent;padding:12px 16px;font-size:15px;font-weight:600;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tab.on{color:var(--brand);border-bottom-color:var(--brand)}
+.tab:hover{color:var(--text)}
+.tabs.sm .tab{font-size:14px;padding:10px 14px}
+
+/* table */
+.tblwrap{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius);background:#fff}
+table.tbl{width:100%;border-collapse:separate;border-spacing:0;font-size:14px}
+.tbl th{background:var(--head);text-align:left;font-weight:600;padding:12px 12px;border-bottom:1px solid var(--border);white-space:nowrap;color:var(--text);font-size:14px}
+.tbl td{padding:11px 12px;border-bottom:1px solid #EEEEEE;vertical-align:middle}
+.tbl tr:nth-child(even) td{background:var(--row-alt)}
+.tbl tr:last-child td{border-bottom:0}
+.tbl tr.clickable{cursor:pointer}
+.tbl tr.clickable:hover td{background:var(--brand-soft)}
+.tbl td.acts{white-space:nowrap;text-align:right;position:sticky;right:0;background:#fff;box-shadow:-8px 0 12px -10px rgba(0,0,0,.25)}
+.tbl th:last-child{position:sticky;right:0;background:var(--head)}
+.tbl tr:nth-child(even) td.acts{background:var(--row-alt)}
+.tbl tr.clickable:hover td.acts{background:var(--brand-soft)}
+.tbl td.acts .btn{margin-left:4px}
+.tbl .sub{display:block;color:var(--muted);font-size:12.5px;margin-top:2px}
+.tbl td.dim,.tbl tr.dim td{color:var(--faint)}
+.tbl .empty{text-align:center;color:var(--muted);padding:40px 16px}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:6px;font-size:12.5px;font-weight:600;border:1px solid transparent;white-space:nowrap}
+.chip.green{background:var(--green-bg);color:var(--green);border-color:var(--green-bd)}
+.chip.amber{background:var(--amber-bg);color:var(--amber);border-color:var(--amber-bd)}
+.chip.info{background:var(--info-bg);color:var(--info);border-color:var(--info-bd)}
+.chip.red{background:var(--red-bg);color:var(--red);border-color:var(--red-bd)}
+.chip.grey{background:var(--grey-bg);color:var(--grey);border-color:#E0E0E0}
+.chip.brand{background:var(--brand-soft);color:var(--brand);border-color:#F3C2CC}
+.chip.dark{background:var(--dark);color:#fff}
+.chip.outline{background:#fff;color:var(--text);border-color:var(--border-strong);font-weight:500}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block}
+.dot.green{background:#17B26A}.dot.grey{background:#B5B5B5}.dot.amber{background:#F59E0B}.dot.red{background:#D92D20}
+
+/* banners */
+.banner{display:flex;gap:12px;align-items:flex-start;padding:12px 16px;border-radius:8px;border:1px solid;font-size:13.5px;line-height:1.45}
+.banner.info{background:var(--info-bg);border-color:var(--info-bd);color:#0B4A6F}
+.banner.amber{background:var(--amber-bg);border-color:var(--amber-bd);color:var(--amber)}
+.banner.red{background:var(--red-bg);border-color:var(--red-bd);color:var(--red)}
+.banner.green{background:var(--green-bg);border-color:var(--green-bd);color:var(--green)}
+.banner.grey{background:var(--head);border-color:var(--border);color:var(--grey)}
+.banner svg{flex:0 0 18px;margin-top:1px}
+.banner b{font-weight:600}
+
+/* forms */
+.field{display:flex;flex-direction:column;gap:6px}
+.field label{font-size:13.5px;font-weight:500;color:var(--text)}
+.field .hint{font-size:12.5px;color:var(--muted)}
+.inp,.sel,.ta{border:1px solid var(--border-strong);border-radius:8px;padding:11px 14px;font-size:15px;background:#fff;width:100%;color:var(--text)}
+.inp[readonly],.inp:disabled,.sel:disabled,.ta:disabled{background:var(--head);color:var(--muted)}
+.sel{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B6B6B' stroke-width='2'><path d='M6 9l6 6 6-6'/></svg>");background-repeat:no-repeat;background-position:right 14px center;padding-right:38px}
+.ta{min-height:84px;resize:vertical}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.fgrid>.field{min-width:0}
+.grid>*{min-width:0}
+.field .row{flex-wrap:wrap}
+.fgrid .full{grid-column:1/-1}
+.inline-num{display:flex;align-items:center;gap:8px}
+.inline-num .inp{width:110px;text-align:center}
+.derived{display:flex;align-items:center;justify-content:space-between;background:var(--head);border-radius:8px;padding:10px 14px;font-size:14px}
+.derived b{font-variant-numeric:tabular-nums}
+
+/* checkbox */
+.cb{display:inline-flex;align-items:flex-start;gap:12px;cursor:pointer;user-select:none}
+.cb .box{width:20px;height:20px;border-radius:5px;border:1.5px solid #C4C4C4;background:#fff;display:grid;place-items:center;flex:0 0 20px;margin-top:1px;transition:background .1s,border-color .1s}
+.cb.on .box,.cb.ind .box{background:var(--brand);border-color:var(--brand)}
+.cb .box svg{display:none;color:#fff}
+.cb.on .box svg.chk{display:block}
+.cb.ind .box svg.min{display:block}
+.cb.dis{cursor:not-allowed}
+.cb.dis .box{background:#F5F5F5;border-color:#E0E0E0}
+.cb.dis.on .box{background:#C9A0AA;border-color:#C9A0AA}
+.cb .txt{font-size:15px}
+.cb.off .txt{color:var(--muted)}
+.cb.dis .txt{color:var(--faint)}
+/* toggle */
+.tg{display:inline-flex;align-items:center;gap:10px;cursor:pointer}
+.tg i{width:40px;height:22px;border-radius:12px;background:#CFCFCF;position:relative;transition:background .15s;flex:0 0 40px}
+.tg i::after{content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s;box-shadow:0 1px 2px rgba(0,0,0,.2)}
+.tg.on i{background:var(--brand)}
+.tg.on i::after{left:21px}
+.tg.dis{opacity:.5;cursor:not-allowed}
+
+/* perms accordion */
+.acc{border-top:1px solid var(--border)}
+.acc:first-child{border-top:0}
+.acc-h{display:flex;align-items:center;gap:14px;padding:16px 20px;cursor:pointer}
+.acc-h .chev{color:var(--muted);transition:transform .15s}
+.acc.open .acc-h .chev{transform:rotate(90deg)}
+.acc-h .ttl{font-size:16px;font-weight:500;flex:1}
+.acc-h .cnt{color:var(--muted);font-size:14px}
+.acc-b{display:none;padding:0 20px 14px 66px}
+.acc.open .acc-b{display:block}
+.acc-b .grp{font-size:13.5px;font-weight:600;color:var(--muted);margin:12px 0 8px}
+.acc-b .cb{display:flex;padding:7px 0}
+.acc.newgrp .acc-h .ttl::after{content:"Nuevo";margin-left:10px;font-size:11px;font-weight:600;color:var(--brand);background:var(--brand-soft);border:1px solid #F3C2CC;border-radius:4px;padding:1px 6px;vertical-align:middle}
+
+/* role list */
+.rolelist{display:flex;flex-direction:column;gap:4px;padding:12px}
+.roleitem{display:flex;align-items:center;gap:10px;padding:12px 14px;border-radius:6px;border:0;background:transparent;text-align:left;font-size:15px;color:var(--muted);width:100%}
+.roleitem:hover{background:var(--head)}
+.roleitem.on{background:var(--brand);color:#fff;font-weight:600}
+.roleitem .nw{font-size:10.5px;font-weight:600;color:var(--brand);background:var(--brand-soft);border:1px solid #F3C2CC;border-radius:4px;padding:1px 6px;margin-left:auto}
+.roleitem.on .nw{color:#fff;background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.4)}
+.rolesec{padding:14px 14px 6px;font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--faint)}
+
+/* filters drawer (inline) */
+.filters{border:1px solid var(--border);border-radius:var(--radius);padding:20px;background:#fff;display:flex;flex-direction:column;gap:16px;align-self:flex-start;min-width:340px}
+.filters h3{font-size:18px;font-weight:600;display:flex;justify-content:space-between;align-items:center}
+.filters .fbtns{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+
+/* big number */
+.bignum{font-size:56px;font-weight:700;letter-spacing:-.02em;line-height:1;color:var(--brand)}
+.bignum small{font-size:24px;font-weight:600;color:var(--muted)}
+
+/* steps / mini */
+.pillrow{display:flex;gap:8px;flex-wrap:wrap}
+.kv{display:grid;grid-template-columns:minmax(120px,160px) 1fr;gap:10px 16px;font-size:14px}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0}
+hr.sep{border:0;border-top:1px solid var(--border);margin:18px 0}
+
+/* HU pins & panel */
+.pin{display:inline-flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;background:var(--brand);border-radius:10px;padding:1px 6px;margin-left:6px;vertical-align:middle;letter-spacing:.02em;line-height:1.4;cursor:help;position:relative;top:-1px}
+.pin.hl{animation:pulse 1.2s ease-in-out 2;box-shadow:0 0 0 4px rgba(129,0,30,.25)}
+@keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.25)}}
+body.hu-off .pin{display:none}
+.hupanel{width:330px;flex:0 0 330px;border-left:1px solid var(--border);background:#FBFBFB;position:sticky;top:34px;height:calc(100vh - 34px);overflow:auto;padding:20px 20px 40px;font-size:13.5px}
+body.hu-off .hupanel{display:none}
+.hupanel .eyebrow{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--brand)}
+.hupanel h3{font-size:16px;font-weight:600;margin:6px 0 10px;line-height:1.3}
+.hupanel .story{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:14px;border-left:3px solid var(--brand);padding-left:10px}
+.hupanel .acl{display:flex;flex-direction:column;gap:6px;margin:0;padding:0;list-style:none}
+.hupanel .acl li{display:flex;gap:10px;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;line-height:1.4}
+.hupanel .acl li:hover{border-color:var(--brand)}
+.hupanel .acl li .n{font-size:11px;font-weight:700;color:var(--brand);white-space:nowrap;margin-top:2px}
+.hupanel .acl li.na{opacity:.6}
+.hupanel .acl li.na .n{color:var(--faint)}
+.hupanel h4{font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.hupanel .note{background:#fff;border:1px solid var(--border);border-radius:6px;padding:10px 12px;margin-bottom:8px;line-height:1.45}
+.hupanel .note.q{border-left:3px solid var(--amber)}
+.hupanel .note.d{border-left:3px solid var(--info)}
+.hupanel .legend{font-size:12px;color:var(--muted);margin-top:14px}
+
+/* drawer */
+.drawer-bg{position:fixed;inset:0;background:rgba(0,0,0,.28);z-index:80;display:none}
+.drawer-bg.show{display:block}
+.drawer{position:fixed;top:0;right:0;bottom:0;width:520px;max-width:100vw;background:#fff;z-index:81;box-shadow:-8px 0 30px rgba(0,0,0,.12);transform:translateX(100%);transition:transform .2s ease;display:flex;flex-direction:column}
+.drawer.show{transform:none}
+.drawer-h{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid var(--border)}
+.drawer-h h3{font-size:18px;font-weight:600}
+.drawer-h .sub{font-size:13px;color:var(--muted);margin-top:2px}
+.drawer-b{padding:22px 24px;overflow:auto;flex:1;display:flex;flex-direction:column;gap:18px}
+.drawer-f{display:flex;justify-content:flex-end;gap:10px;padding:16px 24px;border-top:1px solid var(--border)}
+.drawer.wide{width:720px}
+
+/* modal */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:90;display:none;align-items:center;justify-content:center;padding:20px}
+.modal-bg.show{display:flex}
+.modal{background:#fff;border-radius:12px;width:600px;max-width:100%;box-shadow:0 20px 60px rgba(0,0,0,.25);overflow:hidden}
+.modal-h{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 22px;border-bottom:1px solid var(--border)}
+.modal-h h3{font-size:18px;font-weight:600}
+.modal-h .acts{display:flex;gap:8px}
+.modal-b{padding:22px;display:flex;flex-direction:column;gap:14px;font-size:14.5px;line-height:1.5}
+.modal.wide{width:820px}
+
+/* toast */
+.toasts{position:fixed;right:24px;bottom:24px;z-index:100;display:flex;flex-direction:column;gap:10px}
+.toast{background:var(--dark);color:#fff;padding:12px 16px;border-radius:8px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.25);display:flex;gap:10px;align-items:center;max-width:460px;animation:slide .2s ease}
+.toast.ok{border-left:4px solid #17B26A}.toast.warn{border-left:4px solid #F59E0B}.toast.err{border-left:4px solid #F04438}
+@keyframes slide{from{transform:translateY(8px);opacity:0}to{transform:none;opacity:1}}
+
+/* empty / no access */
+.noaccess{border:1px dashed var(--border-strong);border-radius:12px;padding:60px 30px;text-align:center;color:var(--muted)}
+.noaccess h2{font-size:20px;color:var(--text);margin-bottom:8px}
+
+/* version list */
+.vlist{display:flex;flex-direction:column;gap:10px}
+.vitem{border:1px solid var(--border);border-radius:8px;padding:12px 14px;display:flex;gap:14px;align-items:flex-start}
+.vitem .vn{font-weight:700;color:var(--brand);white-space:nowrap;min-width:36px}
+.vitem .vd{color:var(--muted);font-size:12.5px;margin-top:2px}
+.vitem.cur{border-color:var(--brand);background:var(--brand-soft)}
+
+/* matrix */
+.matrix td.c{text-align:center}
+.tick{color:#17B26A;font-weight:700}
+.cross{color:#C4C4C4}
+
+/* sticky save bar */
+.savebar{position:sticky;bottom:0;display:flex;align-items:center;gap:14px;padding:14px 20px;background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 -6px 24px rgba(0,0,0,.08);margin-top:18px}
+.savebar .msg{flex:1;font-weight:500}
+
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+@media (max-width:1380px){.hupanel{display:none}}
+@media (max-width:1100px){.kpis{grid-template-columns:1fr 1fr}.g-side,.g-side-r{grid-template-columns:1fr}.sidebar{width:230px;flex-basis:230px}}
+@media (max-width:760px){.app{flex-direction:column}.sidebar{position:static;height:auto;width:100%;flex-basis:auto}.main{padding:20px 16px}.kpis{grid-template-columns:1fr}.search{flex:1}.pagehead{flex-direction:column}.fgrid{grid-template-columns:1fr}.drawer{width:100vw}}
+</style>
+
+</head>
+<body>
+<div class="demobar" id="demobar">
+  <span class="tag">WIREFRAME</span>
+  <span>Aprix · Validación de Diseños · <b>Módulo 1 — Administración</b> · referencia para diseño y refinamiento</span>
+  <span class="grow"></span>
+  <label>Ver como
+    <select id="viewerSel"></select>
+  </label>
+  <span class="sw on" id="huToggle" role="switch" aria-checked="true" tabindex="0"><i></i>Referencia HU</span>
+  <button id="btnBitacora" type="button">Bitácora</button>
+  <button id="btnReset" type="button">Reiniciar demo</button>
+</div>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Navegación Aprix">
+    <div class="sb-top"><div class="sb-logo"></div><div class="sb-brandbar"></div><button class="sb-collapse" type="button" aria-label="Colapsar menú">⇤</button></div>
+    <nav class="nav" id="nav"></nav>
+    <div class="sb-bottom">
+      <div class="usercard">
+        <div><div class="nm" id="ucName">Mariana López</div><div class="rl" id="ucRole">Administrador VD · 4021873</div></div>
+        <span class="out" aria-hidden="true">⎋</span>
+      </div>
+      <div class="release">Release 2.0 · Validación de Diseños</div>
+    </div>
+  </aside>
+
+  <main class="main" id="main"></main>
+
+  <aside class="hupanel" id="hupanel" aria-label="Referencia de historia de usuario"></aside>
+</div>
+
+<div class="drawer-bg" id="drawerBg"></div>
+<div class="drawer" id="drawer" role="dialog" aria-modal="true"></div>
+<div class="modal-bg" id="modalBg"><div class="modal" id="modal" role="dialog" aria-modal="true"></div></div>
+<div class="toasts" id="toasts"></div>
+
+<script>
+/* ===================== utilidades ===================== */
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const TODAY = new Date(2026, 8, 22); // 22/09/2026 (fecha fija para la demo)
+const DIAS = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+const pad = n => String(n).padStart(2, '0');
+const fmt = d => d ? `${pad(d.getDate())}/${pad(d.getMonth() + 1)}/${d.getFullYear()}` : '—';
+const fmtS = d => d ? `${pad(d.getDate())}/${pad(d.getMonth() + 1)}` : '—';
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const dayDiff = (a, b) => Math.round((a - b) / 86400000);
+const nowStr = () => '22/09/2026 ' + new Date().toTimeString().slice(0, 5);
+const ICON = {
+  home: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg>',
+  search: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>',
+  filter: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 6h16M7 12h10M10 18h4"/></svg>',
+  down: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3v12m0 0l-4-4m4 4l4-4M4 17v3h16v-3"/></svg>',
+  chev: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg>',
+  gear: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>',
+  hist: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 3"/></svg>',
+  close: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>',
+  plus: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>',
+  info: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></svg>',
+  warn: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l10 18H2z"/><path d="M12 10v4M12 17h.01"/></svg>',
+  lock: '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>',
+  chk: '<svg class="chk" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 12l5 5L20 7"/></svg><svg class="min" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><path d="M5 12h14"/></svg>',
+  cal: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>',
+  promo: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6" opacity=".0"/><path d="M14.5 9.5L10 14l-1-3.5z"/></svg>',
+  rules: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3v18M5 7h14M7 7l-3 6h6zM17 7l-3 6h6z"/></svg>',
+  book: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M4 5a2 2 0 0 1 2-2h5v16H6a2 2 0 0 0-2 2zM20 5a2 2 0 0 0-2-2h-5v16h5a2 2 0 0 1 2 2z"/></svg>',
+  store: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M3 9l2-5h14l2 5M3 9h18v11H3zM9 20v-6h6v6"/></svg>',
+  box: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l9 5-9 5-9-5zM3 8v8l9 5 9-5V8M12 13v8"/></svg>',
+  report: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 16v-4M12 16V9M16 16v-2"/></svg>',
+  users: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="9" cy="8" r="3.5"/><path d="M2.5 20a6.5 6.5 0 0 1 13 0M16 4a3.5 3.5 0 0 1 0 7M21.5 20a6.5 6.5 0 0 0-4.5-6.2"/></svg>',
+  shield: '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>',
+  export: '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 0L8 7m4-4l4 4M4 17v3h16v-3"/></svg>',
+};
+
+function toast(msg, kind = 'ok', ms = 3600) {
+  const box = $('#toasts'); while (box.children.length >= 2) box.firstChild.remove();
+  const t = document.createElement('div'); t.className = 'toast ' + kind; t.innerHTML = msg;
+  box.appendChild(t); setTimeout(() => t.remove(), ms);
+}
+let modalCb = null;
+function openModal({ title, body, confirm = 'Confirmar', cancel = 'Cancelar', onConfirm, wide = false, danger = false, hideConfirm = false }) {
+  const m = $('#modal'); m.className = 'modal' + (wide ? ' wide' : '');
+  m.innerHTML = `<div class="modal-h"><h3>${title}</h3><div class="acts">
+      <button class="btn ghost sm" type="button" id="mCancel">${cancel}</button>
+      ${hideConfirm ? '' : `<button class="btn ${danger ? 'brand' : 'primary'} sm" type="button" id="mOk">${confirm}</button>`}
+    </div></div><div class="modal-b">${body}</div>`;
+  $('#modalBg').classList.add('show');
+  $('#mCancel').onclick = closeModal;
+  if (!hideConfirm) $('#mOk').onclick = () => { const r = onConfirm ? onConfirm() : true; if (r !== false) closeModal(); };
+  modalCb = null;
+}
+function closeModal() { $('#modalBg').classList.remove('show'); }
+function openDrawer({ title, sub = '', body, footer = '', wide = false }) {
+  const d = $('#drawer'); d.className = 'drawer show' + (wide ? ' wide' : '');
+  d.innerHTML = `<div class="drawer-h"><div><h3>${title}</h3>${sub ? `<div class="sub">${sub}</div>` : ''}</div><button class="btn ghost icon" type="button" id="dClose" aria-label="Cerrar">${ICON.close}</button></div>
+    <div class="drawer-b">${body}</div>${footer ? `<div class="drawer-f">${footer}</div>` : ''}`;
+  $('#drawerBg').classList.add('show');
+  $('#dClose').onclick = closeDrawer;
+}
+function closeDrawer() { $('#drawer').classList.remove('show'); $('#drawerBg').classList.remove('show'); }
+$('#drawerBg').addEventListener('click', closeDrawer);
+$('#modalBg').addEventListener('click', e => { if (e.target === e.currentTarget) closeModal(); });
+document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeDrawer(); } });
+
+const cbHtml = (on, txt, opts = {}) => `<span class="cb ${on === 'ind' ? 'ind' : on ? 'on' : 'off'}${opts.dis ? ' dis' : ''}" role="checkbox" aria-checked="${on === 'ind' ? 'mixed' : !!on}" tabindex="0" ${opts.attrs || ''}><span class="box">${ICON.chk}</span>${txt ? `<span class="txt">${txt}</span>` : ''}</span>`;
+const chip = (txt, cls = 'grey') => `<span class="chip ${cls}">${txt}</span>`;
+const pin = (n) => `<span class="pin" data-ac="${n}" title="Criterio de aceptación ${n}">${n}</span>`;
+const banner = (kind, html, icon = 'info') => `<div class="banner ${kind}">${ICON[icon]}<div>${html}</div></div>`;
+
+/* ===================== datos de la demo ===================== */
+const PROC_SEED = [
+  { id: 'nac', name: 'Nacional', desc: 'Promociones nacionales configuradas por Categoría; validación completa contra Lista de Producción, Reporte de Promociones y Banco de Imágenes.', lp: true, rp: true, bi: true, print: true, rules: 'RS-NAC', threshold: null, nOpen: -20, nClose: -7, active: true, steps: ['pre', 'folio', 'img', 'print'] },
+  { id: 'loc', name: 'Local', desc: 'Promociones locales por plaza; mismos insumos que Nacional con ventana propia.', lp: true, rp: true, bi: true, print: true, rules: 'RS-NAC', threshold: null, nOpen: -18, nClose: -6, active: true, steps: ['pre', 'folio', 'img', 'print'] },
+  { id: 'cer', name: 'Cerveza', desc: 'Promociones de cerveza con reglas propias de legales y vigencia.', lp: true, rp: true, bi: true, print: true, rules: 'RS-CER', threshold: null, nOpen: -20, nClose: -8, active: true, steps: ['pre', 'folio', 'img', 'print'] },
+  { id: 'cv', name: 'Cortas Vigencias', desc: 'Promociones de vigencia corta; ventana de validación reducida.', lp: true, rp: true, bi: true, print: true, rules: 'RS-CV', threshold: 97, nOpen: -10, nClose: -3, active: true, steps: ['pre', 'folio', 'img', 'print'] },
+  { id: 'rea', name: 'Reacción', desc: 'Promociones de reacción: solo Reporte de Promociones, sin Lista de Producción ni flujo de impresión.', lp: false, rp: true, bi: true, print: false, rules: 'RS-REA', threshold: null, nOpen: -5, nClose: -1, active: true, steps: ['pre', 'folio', 'img'] },
+];
+const STEPS = { pre: 'Prevalidación técnica del archivo', folio: 'Asociación a folio', img: 'Validación de imagen contra el banco', print: 'Liberación a impresión' };
+const FIELDS = ['Precio promocional', 'Precio anterior (tachado)', 'Descripción de mecánica', 'SKU / código de barras', 'Código QR / ArUco', 'Imagen de producto', 'Texto legal', 'Vigencia', 'Logo / marca'];
+const INPUT_FIELDS = ['Precio (Lista de Producción)', 'Precio regular (Lista de Producción)', 'Mecánica (Reporte de Promociones)', 'SKU (Lista de Producción)', 'Código (MEP)', 'Imagen vigente (Banco de imágenes)', 'Leyenda legal (Reporte de Promociones)', 'Fecha inicio / fin (Reporte de Promociones)', 'Marca (Catálogo de artículos)'];
+const COMPARE = ['Igualdad exacta', 'Similitud de texto', 'Similitud visual', 'Decodificación y match', 'Igualdad de fechas', 'Presencia'];
+
+function periodsFor(year, n = 13) {
+  const out = []; let s = new Date(year, 0, 1);
+  for (let i = 1; i <= n; i++) { const e = addDays(s, 27); out.push({ id: `P${pad(i)}`, year, start: s, end: e }); s = addDays(e, 1); }
+  return out;
+}
+function buildState() {
+  const S = { periodsPerYear: 13, year: 2026, viewer: 'admin', hu: true };
+  S.procs = JSON.parse(JSON.stringify(PROC_SEED));
+  S.periods = { 2025: periodsFor(2025), 2026: periodsFor(2026), 2027: [] };
+  // ventanas 2026: P09..P13 para cada proceso
+  S.windows = []; let id = 1;
+  for (const p of S.periods[2026].filter(p => ['P08', 'P09', 'P10', 'P11', 'P12', 'P13'].includes(p.id))) {
+    for (const pr of S.procs) {
+      S.windows.push({ id: id++, year: 2026, period: p.id, proc: pr.id, nOpen: pr.nOpen, nClose: pr.nClose, manual: null, motivo: '' });
+    }
+  }
+  // ajustes de ejemplo
+  const w = S.windows.find(x => x.period === 'P11' && x.proc === 'loc'); if (w) { w.nOpen = -16; }
+  const w2 = S.windows.find(x => x.period === 'P11' && x.proc === 'cv'); if (w2) { w2.manual = 'closed'; w2.motivo = 'Insumos incompletos: falta Lista de Producción'; }
+  // disponibilidad de insumos (P11)
+  S.inputs = {
+    P10: { nac: { lp: 1, rp: 1, bi: 1 }, loc: { lp: 1, rp: 1, bi: 1 }, cer: { lp: 1, rp: 1, bi: 1 }, cv: { lp: 1, rp: 1, bi: 1 }, rea: { rp: 1, bi: 1 } },
+    P11: { nac: { lp: 1, rp: 1, bi: 1 }, loc: { lp: 1, rp: 1, bi: 1 }, cer: { lp: 1, rp: 1, bi: 1 }, cv: { lp: 0, rp: 1, bi: 1 }, rea: { rp: 1, bi: 1 } },
+    P12: { nac: { lp: 0, rp: 0, bi: 1 }, loc: { lp: 0, rp: 0, bi: 1 }, cer: { lp: 0, rp: 0, bi: 1 }, cv: { lp: 0, rp: 0, bi: 1 }, rea: { rp: 0, bi: 1 } },
+  };
+  S.procInactive = { P12: ['rea'] }; // proceso desactivado por periodo
+  // umbral
+  S.threshold = { global: 98, appliesFrom: 'P11 · 2026', overrides: [
+    { id: 1, proc: 'cv', field: null, value: 97, from: 'P09 · 2026' },
+    { id: 2, proc: 'nac', field: 'Imagen de producto', value: 95, from: 'P10 · 2026' },
+    { id: 3, proc: 'cer', field: 'Texto legal', value: 100, from: 'P09 · 2026' },
+  ], history: [
+    { ts: '03/08/2026 10:12', user: 'Mariana López', scope: 'Global', before: '97%', after: '98%', from: 'P10 · 2026', motivo: 'Resultado de la calibración con el golden set del piloto' },
+    { ts: '20/07/2026 16:40', user: 'Mariana López', scope: 'Cerveza · Texto legal', before: '98%', after: '100%', from: 'P09 · 2026', motivo: 'Legales de cerveza sin tolerancia (COFEPRIS)' },
+    { ts: '20/07/2026 16:31', user: 'Mariana López', scope: 'Cortas Vigencias', before: '98%', after: '97%', from: 'P09 · 2026', motivo: 'Piezas con más texto libre' },
+    { ts: '01/07/2026 09:05', user: 'Sistema', scope: 'Global', before: '—', after: '97%', from: 'P08 · 2026', motivo: 'Valor inicial de arranque del módulo' },
+  ] };
+  S.blocked = []; // intentos bloqueados
+  // reglas
+  S.ruleSets = [
+    { id: 'RS-NAC', name: 'Nacional y Local', procs: ['nac', 'loc'], from: 'P09 · 2026', to: 'P13 · 2026', version: 7, status: 'Vigente', rules: [
+      { id: 1, field: 'Precio promocional', input: 'Precio (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 25, active: true },
+      { id: 2, field: 'Descripción de mecánica', input: 'Mecánica (Reporte de Promociones)', cmp: 'Similitud de texto', tol: '≥ 95%', mand: true, sev: 'Mayor', weight: 20, active: true },
+      { id: 3, field: 'SKU / código de barras', input: 'SKU (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 15, active: true },
+      { id: 4, field: 'Código QR / ArUco', input: 'Código (MEP)', cmp: 'Decodificación y match', tol: '0', mand: true, sev: 'Crítica', weight: 10, active: true },
+      { id: 5, field: 'Imagen de producto', input: 'Imagen vigente (Banco de imágenes)', cmp: 'Similitud visual', tol: '≥ 90%', mand: true, sev: 'Mayor', weight: 15, active: true },
+      { id: 6, field: 'Texto legal', input: 'Leyenda legal (Reporte de Promociones)', cmp: 'Similitud de texto', tol: '≥ 98%', mand: true, sev: 'Mayor', weight: 5, active: true },
+      { id: 7, field: 'Vigencia', input: 'Fecha inicio / fin (Reporte de Promociones)', cmp: 'Igualdad de fechas', tol: '0 días', mand: true, sev: 'Crítica', weight: 5, active: true },
+      { id: 8, field: 'Logo / marca', input: 'Marca (Catálogo de artículos)', cmp: 'Presencia', tol: '—', mand: false, sev: 'Menor', weight: 3, active: true },
+      { id: 9, field: 'Precio anterior (tachado)', input: 'Precio regular (Lista de Producción)', cmp: 'Igualdad exacta', tol: '± $0.50', mand: false, sev: 'Menor', weight: 2, active: true },
+    ], versions: [
+      { v: 7, ts: '14/08/2026 11:20', user: 'Diego Ramírez', detail: 'Tolerancia de mecánica ≥ 95% (antes ≥ 93%)', from: 'P10 · 2026' },
+      { v: 6, ts: '02/08/2026 17:05', user: 'Diego Ramírez', detail: 'Alta de regla «Precio anterior (tachado)» peso 2', from: 'P10 · 2026' },
+      { v: 5, ts: '21/07/2026 09:48', user: 'Diego Ramírez', detail: 'Peso de Imagen de producto 15 (antes 12); mecánica 20 (antes 23) — impacto operativo, notificado a validadores', from: 'P09 · 2026' },
+      { v: 4, ts: '08/07/2026 12:30', user: 'Mariana López', detail: 'Severidad de Vigencia: Crítica (antes Mayor)', from: 'P09 · 2026' },
+      { v: 3, ts: '30/06/2026 15:10', user: 'Diego Ramírez', detail: 'Alta de regla «Código QR / ArUco»', from: 'P09 · 2026' },
+      { v: 2, ts: '24/06/2026 10:02', user: 'Diego Ramírez', detail: 'Texto legal pasa a obligatoria', from: 'P08 · 2026' },
+      { v: 1, ts: '15/06/2026 09:00', user: 'Mariana López', detail: 'Conjunto inicial (7 reglas) tomado del documento de requerimientos', from: 'P08 · 2026' },
+    ] },
+    { id: 'RS-CER', name: 'Cerveza', procs: ['cer'], from: 'P09 · 2026', to: 'P13 · 2026', version: 3, status: 'Vigente', rules: [
+      { id: 1, field: 'Precio promocional', input: 'Precio (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 25, active: true },
+      { id: 2, field: 'Descripción de mecánica', input: 'Mecánica (Reporte de Promociones)', cmp: 'Similitud de texto', tol: '≥ 95%', mand: true, sev: 'Mayor', weight: 15, active: true },
+      { id: 3, field: 'SKU / código de barras', input: 'SKU (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 15, active: true },
+      { id: 4, field: 'Imagen de producto', input: 'Imagen vigente (Banco de imágenes)', cmp: 'Similitud visual', tol: '≥ 90%', mand: true, sev: 'Mayor', weight: 15, active: true },
+      { id: 5, field: 'Texto legal', input: 'Leyenda legal (Reporte de Promociones)', cmp: 'Similitud de texto', tol: '100%', mand: true, sev: 'Crítica', weight: 20, active: true },
+      { id: 6, field: 'Vigencia', input: 'Fecha inicio / fin (Reporte de Promociones)', cmp: 'Igualdad de fechas', tol: '0 días', mand: true, sev: 'Crítica', weight: 10, active: true },
+    ], versions: [
+      { v: 3, ts: '05/08/2026 13:12', user: 'Diego Ramírez', detail: 'Texto legal: tolerancia 100% y severidad Crítica', from: 'P10 · 2026' },
+      { v: 2, ts: '10/07/2026 10:40', user: 'Diego Ramírez', detail: 'Peso de legales 20 (antes 10)', from: 'P09 · 2026' },
+      { v: 1, ts: '15/06/2026 09:00', user: 'Mariana López', detail: 'Conjunto inicial', from: 'P08 · 2026' },
+    ] },
+    { id: 'RS-CV', name: 'Cortas Vigencias', procs: ['cv'], from: 'P09 · 2026', to: 'P13 · 2026', version: 2, status: 'Vigente', rules: [
+      { id: 1, field: 'Precio promocional', input: 'Precio (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 30, active: true },
+      { id: 2, field: 'Descripción de mecánica', input: 'Mecánica (Reporte de Promociones)', cmp: 'Similitud de texto', tol: '≥ 92%', mand: true, sev: 'Mayor', weight: 25, active: true },
+      { id: 3, field: 'SKU / código de barras', input: 'SKU (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 20, active: true },
+      { id: 4, field: 'Vigencia', input: 'Fecha inicio / fin (Reporte de Promociones)', cmp: 'Igualdad de fechas', tol: '0 días', mand: true, sev: 'Crítica', weight: 25, active: true },
+    ], versions: [
+      { v: 2, ts: '18/07/2026 11:00', user: 'Diego Ramírez', detail: 'Tolerancia de mecánica ≥ 92%', from: 'P09 · 2026' },
+      { v: 1, ts: '15/06/2026 09:00', user: 'Mariana López', detail: 'Conjunto inicial', from: 'P08 · 2026' },
+    ] },
+    { id: 'RS-REA', name: 'Reacción', procs: ['rea'], from: 'P09 · 2026', to: 'P13 · 2026', version: 4, status: 'Vigente', rules: [
+      { id: 1, field: 'Precio promocional', input: 'Precio (Lista de Producción)', cmp: 'Igualdad exacta', tol: '0', mand: true, sev: 'Crítica', weight: 35, active: true },
+      { id: 2, field: 'Descripción de mecánica', input: 'Mecánica (Reporte de Promociones)', cmp: 'Similitud de texto', tol: '≥ 95%', mand: true, sev: 'Mayor', weight: 30, active: true },
+      { id: 3, field: 'Imagen de producto', input: 'Imagen vigente (Banco de imágenes)', cmp: 'Similitud visual', tol: '≥ 90%', mand: true, sev: 'Mayor', weight: 20, active: true },
+      { id: 4, field: 'Vigencia', input: 'Fecha inicio / fin (Reporte de Promociones)', cmp: 'Igualdad de fechas', tol: '0 días', mand: true, sev: 'Crítica', weight: 15, active: true },
+    ], versions: [
+      { v: 4, ts: '12/08/2026 16:22', user: 'Diego Ramírez', detail: 'Precio tomado de Reporte de Promociones (Reacción no tiene Lista de Producción) — ajuste de campo del insumo', from: 'P10 · 2026' },
+      { v: 3, ts: '25/07/2026 09:15', user: 'Diego Ramírez', detail: 'Peso de imagen 20 (antes 15)', from: 'P09 · 2026' },
+      { v: 2, ts: '01/07/2026 14:00', user: 'Diego Ramírez', detail: 'Se elimina regla de QR (no aplica en Reacción)', from: 'P09 · 2026' },
+      { v: 1, ts: '15/06/2026 09:00', user: 'Mariana López', detail: 'Conjunto inicial', from: 'P08 · 2026' },
+    ] },
+  ];
+  // errores
+  S.sevs = [
+    { name: 'Crítica', effect: 'Detiene el flujo del diseño o del lote afectado y exige resolución explícita antes de continuar.', cls: 'red', order: 1, editable: false },
+    { name: 'Mayor', effect: 'Impide la aprobación automática y envía el diseño a revisión manual en la bandeja.', cls: 'amber', order: 2, editable: false },
+    { name: 'Menor', effect: 'Se registra y descuenta del porcentaje de coincidencia; no bloquea.', cls: 'info', order: 3, editable: false },
+  ];
+  S.errors = [
+    { code: 'ERR-INS-001', name: 'Insumo no disponible para el periodo', cat: 'Insumo', sev: 'Crítica', block: true, role: 'Coordinador de Diseños', rec: 'Cargar o sincronizar el insumo antes de iniciar el ciclo del proceso.', active: true },
+    { code: 'ERR-INS-002', name: 'Insumo con estructura inválida', cat: 'Insumo', sev: 'Crítica', block: true, role: 'Coordinador de Diseños', rec: 'Revisar columnas obligatorias y volver a cargar el archivo.', active: true },
+    { code: 'ERR-INS-003', name: 'Versión de insumo desactualizada', cat: 'Insumo', sev: 'Mayor', block: false, role: 'Coordinador de Diseños', rec: 'Conciliar la versión vigente antes de revalidar.', active: true },
+    { code: 'ERR-DIS-001', name: 'Precio no coincide con Lista de Producción', cat: 'Diseño', sev: 'Crítica', block: true, role: 'Imprenta', rec: 'Corregir el precio en el diseño y cargar nueva versión.', active: true },
+    { code: 'ERR-DIS-002', name: 'Descripción de mecánica difiere del Reporte de Promociones', cat: 'Diseño', sev: 'Mayor', block: false, role: 'Imprenta', rec: 'Alinear el texto de la mecánica con el reporte vigente.', active: true },
+    { code: 'ERR-DIS-003', name: 'SKU / código de barras no coincide', cat: 'Diseño', sev: 'Crítica', block: true, role: 'Imprenta', rec: 'Verificar el SKU del folio y regenerar el código.', active: true },
+    { code: 'ERR-DIS-004', name: 'Texto legal incompleto o distinto', cat: 'Diseño', sev: 'Mayor', block: false, role: 'Imprenta', rec: 'Usar la leyenda legal vigente del reporte.', active: true },
+    { code: 'ERR-DIS-005', name: 'Vigencia fuera del periodo promocional', cat: 'Diseño', sev: 'Crítica', block: true, role: 'Imprenta', rec: 'Corregir las fechas de vigencia impresas.', active: true },
+    { code: 'ERR-DIS-006', name: 'Logo o marca ausente', cat: 'Diseño', sev: 'Menor', block: false, role: 'Imprenta', rec: 'Incluir el logotipo de la marca del artículo.', active: true },
+    { code: 'ERR-DIS-007', name: 'Diseño sin folio asociado', cat: 'Diseño', sev: 'Mayor', block: false, role: 'Imprenta', rec: 'Asociar el archivo a su folio desde la bandeja de la imprenta.', active: true },
+    { code: 'ERR-IMG-001', name: 'Imagen de producto no coincide con la vigente', cat: 'Imagen', sev: 'Mayor', block: false, role: 'Imprenta', rec: 'Descargar la imagen vigente del banco y reemplazarla.', active: true },
+    { code: 'ERR-IMG-002', name: 'Sin imagen vigente en el banco (bloqueado por insumo)', cat: 'Imagen', sev: 'Crítica', block: true, role: 'Operación Promociones', rec: 'Publicar la imagen vigente en el banco; el diseño se revalida solo.', active: true },
+    { code: 'ERR-IMG-003', name: 'Imagen obsoleta', cat: 'Imagen', sev: 'Menor', block: false, role: 'Operación Promociones', rec: 'Actualizar la vigencia de la imagen en el banco.', active: true },
+    { code: 'ERR-INT-001', name: 'Conexión con Data Lake no disponible', cat: 'Integración', sev: 'Crítica', block: true, role: 'Soporte técnico', rec: 'Reintento automático (3); si persiste, escalar a soporte.', active: true },
+    { code: 'ERR-INT-002', name: 'Reintentos automáticos agotados', cat: 'Integración', sev: 'Mayor', block: false, role: 'Soporte técnico', rec: 'Revisar la conexión y relanzar la transferencia.', active: true },
+    { code: 'ERR-SIS-001', name: 'Tiempo de procesamiento excedido (> 1 min por diseño)', cat: 'Sistema', sev: 'Menor', block: false, role: 'Soporte técnico', rec: 'Se reintenta en el siguiente lote; revisar carga del clúster.', active: true },
+    { code: 'ERR-SIS-002', name: 'Ejecución fuera de la ventana autorizada', cat: 'Sistema', sev: 'Crítica', block: true, role: 'Administrador', rec: 'Verificar la ventana vigente del proceso en Calendario de validación o reabrirla.', active: true },
+  ];
+  S.errVersions = [
+    { v: 3, ts: '19/08/2026 10:05', user: 'Diego Ramírez', detail: 'Alta ERR-IMG-002 «Sin imagen vigente» como Crítica que bloquea (estado Bloqueado por insumo)' },
+    { v: 2, ts: '28/07/2026 15:30', user: 'Diego Ramírez', detail: 'ERR-DIS-004 pasa de Menor a Mayor' },
+    { v: 1, ts: '15/06/2026 09:00', user: 'Mariana López', detail: 'Catálogo inicial (15 tipos) a partir de la definición abierta n.º 4' },
+  ];
+  // roles y permisos
+  S.roles = buildRoles();
+  S.users = [
+    { name: 'Juan Carlos Hernández', id: '3986907', role: 'super', imp: '—', last: '22/09/2026 08:14', chg: '01/09/2026', by: 'Sistema' },
+    { name: 'Mariana López', id: '4021873', role: 'admin', imp: '—', last: '22/09/2026 09:02', chg: '15/06/2026', by: 'Juan Carlos Hernández' },
+    { name: 'Diego Ramírez', id: '4103311', role: 'coord', imp: '—', last: '21/09/2026 18:40', chg: '15/06/2026', by: 'Mariana López' },
+    { name: 'Paola Ruiz', id: '4118820', role: 'valid', imp: '—', last: '22/09/2026 08:55', chg: '02/07/2026', by: 'Mariana López' },
+    { name: 'Carlos Vega', id: 'EXT-0117', role: 'imp', imp: 'Milenio', last: '21/09/2026 17:12', chg: '20/08/2026', by: 'Mariana López' },
+    { name: 'Ana Torres', id: 'EXT-0142', role: 'imp', imp: 'Gráfica del Norte', last: '19/09/2026 11:30', chg: '20/08/2026', by: 'Mariana López' },
+    { name: 'Luis Ortega', id: '3877012', role: 'consulta', imp: '—', last: '18/09/2026 16:05', chg: '10/08/2026', by: 'Mariana López' },
+  ];
+  S.log = [
+    { ts: '19/08/2026 10:05', user: 'Diego Ramírez', mod: 'Tipología de errores', action: 'Alta de tipo de error', obj: 'ERR-IMG-002', before: '—', after: 'Crítica · bloquea', motivo: 'Estado «Bloqueado por insumo»', type: 'cambio' },
+    { ts: '14/08/2026 11:20', user: 'Diego Ramírez', mod: 'Reglas de validación', action: 'Nueva versión v7', obj: 'RS-NAC · Descripción de mecánica', before: '≥ 93%', after: '≥ 95%', motivo: 'Calibración con golden set', type: 'cambio' },
+    { ts: '03/08/2026 10:12', user: 'Mariana López', mod: 'Umbral de coincidencia', action: 'Cambio de umbral global', obj: 'Global', before: '97%', after: '98%', motivo: 'Aplica desde P10 · 2026', type: 'cambio' },
+    { ts: '28/07/2026 09:31', user: 'Paola Ruiz', mod: 'Umbral de coincidencia', action: 'Intento de modificación', obj: 'Global', before: '—', after: '—', motivo: 'Sin permiso «Modificar umbral»', type: 'bloqueado' },
+    { ts: '20/07/2026 08:50', user: 'Mariana López', mod: 'Calendario de validación', action: 'Cierre manual de ventana', obj: 'P11 · Cortas Vigencias', before: 'Programada', after: 'Cerrada', motivo: 'Insumos incompletos: falta Lista de Producción', type: 'cambio' },
+    { ts: '20/07/2026 08:40', user: 'Mariana López', mod: 'Calendario de validación', action: 'Edición de N apertura', obj: 'P11 · Local', before: 'N-18', after: 'N-16', motivo: 'Plazas piden dos días más de ventana', type: 'cambio' },
+    { ts: '15/06/2026 09:00', user: 'Juan Carlos Hernández', mod: 'Roles y usuarios', action: 'Alta de rol', obj: 'Administrador VD', before: '—', after: 'Creado', motivo: 'Arranque del módulo', type: 'cambio' },
+  ];
+  return S;
+}
+function buildRoles() {
+  const P = PERMS;
+  const all = P.groups.flatMap(g => g.items.map(i => i.id));
+  const set = ids => Object.fromEntries(all.map(id => [id, ids.includes(id)]));
+  const adminVD = all.filter(id => id.startsWith('vd.'));
+  const coord = ['vd.cal.view', 'vd.proc.view', 'vd.proc.edit', 'vd.proc.deact', 'vd.umbral.view', 'vd.reglas.view', 'vd.reglas.edit', 'vd.reglas.export', 'vd.err.view', 'vd.err.edit', 'vd.op.insumo', 'vd.op.ejecutar', 'vd.op.bandeja', 'vd.op.reportes', 'vd.op.bitacora', 'vd.op.banco', 'vd.op.cerrar'];
+  const valid = ['vd.cal.view', 'vd.proc.view', 'vd.umbral.view', 'vd.reglas.view', 'vd.err.view', 'vd.op.bandeja', 'vd.op.aprobar', 'vd.op.rechazar', 'vd.op.reportes', 'vd.op.banco'];
+  const imp = ['vd.op.diseno', 'vd.op.bandejaimp'];
+  const consulta = ['vd.cal.view', 'vd.proc.view', 'vd.umbral.view', 'vd.reglas.view', 'vd.err.view', 'vd.op.reportes', 'vd.op.bitacora'];
+  const aprixSuper = ['ap.cal.1', 'ap.cal.3', 'ap.cal.4', 'ap.cal.5', 'ap.roles.1', 'ap.roles.2', 'ap.reg.1', 'ap.reg.3', 'ap.reg.4', 'ap.cat.1', 'ap.conf.1', 'ap.conf.3', 'ap.conf.4', 'ap.conf.5'];
+  const aprixCat = ['ap.cal.1', 'ap.cal.3', 'ap.cal.4', 'ap.reg.1', 'ap.cat.1', 'ap.cat.2', 'ap.conf.1', 'ap.conf.2', 'ap.conf.3', 'ap.conf.4'];
+  const aprixOp = ['ap.cal.1', 'ap.cal.2', 'ap.cal.3', 'ap.cal.4', 'ap.cal.5', 'ap.reg.1', 'ap.reg.2', 'ap.reg.3', 'ap.reg.4', 'ap.cat.1', 'ap.conf.1', 'ap.conf.5', 'vd.cal.view', 'vd.proc.view', 'vd.reglas.view', 'vd.err.view', 'vd.op.bandeja', 'vd.op.aprobar', 'vd.op.rechazar', 'vd.op.reportes'];
+  const aprixReg = ['ap.cal.1', 'ap.cal.2', 'ap.cal.3', 'ap.cal.4', 'ap.cat.1', 'ap.conf.1'];
+  return {
+    super: { name: 'Super usuario', perms: set([...aprixSuper, ...all.filter(id => id.startsWith('vd.'))]), isNew: false, scope: null },
+    cat: { name: 'Categoría', perms: set(aprixCat), isNew: false, scope: null },
+    oper: { name: 'Operación de promociones', perms: set(aprixOp), isNew: false, scope: null },
+    reg: { name: 'Región', perms: set(aprixReg), isNew: false, scope: null },
+    admin: { name: 'Administrador VD', perms: set([...adminVD, 'ap.cal.1', 'ap.roles.1', 'ap.roles.2']), isNew: true, scope: null },
+    coord: { name: 'Coordinador de Diseños', perms: set([...coord, 'ap.cal.1']), isNew: true, scope: null },
+    valid: { name: 'Validador Operación Promociones', perms: set([...valid, 'ap.cal.1']), isNew: true, scope: null },
+    imp: { name: 'Imprenta', perms: set(imp), isNew: true, scope: 'Solo sus propios diseños y folios. No accede a diseños ni resultados de otras imprentas (aislamiento en la capa de datos).' },
+    consulta: { name: 'Consulta VD', perms: set([...consulta, 'ap.cal.1']), isNew: true, scope: null },
+  };
+}
+const PERMS = { groups: [
+  { id: 'ap.cal', name: 'Calendario Promocional', existing: true, items: [
+    { id: 'ap.cal.1', t: 'Visualización del calendario de periodos y eventos' }, { id: 'ap.cal.2', t: 'Visualización del calendario de actividades por proceso (Nacional, Cerveza, Local, Corta Vigencia, Reacción)' }, { id: 'ap.cal.3', t: 'Descarga de calendarios' }, { id: 'ap.cal.4', t: 'Filtrar por evento o periodo del calendario' }, { id: 'ap.cal.5', t: 'Visualización de calendarios de años anteriores o siguientes' }] },
+  { id: 'ap.roles', name: 'Roles y usuarios', existing: true, items: [{ id: 'ap.roles.1', t: 'Visualización del submódulo de roles y permisos asociados' }, { id: 'ap.roles.2', t: 'Actualizar / editar permisos por rol' }] },
+  { id: 'ap.reg', name: 'Reglas promocionales', existing: true, items: [{ id: 'ap.reg.1', t: 'Visualización del submódulo de precios de camión', g: 'Precios de Camión' }, { id: 'ap.reg.2', t: 'Carga de precios de camión', g: 'Precios de Camión' }, { id: 'ap.reg.3', t: 'Visualización del submódulo de parámetros de cobertura', g: 'Parámetros de cobertura' }, { id: 'ap.reg.4', t: 'Edición de valores de parámetros de cobertura', g: 'Parámetros de cobertura' }] },
+  { id: 'ap.cat', name: 'Catálogo de artículos', existing: true, items: [{ id: 'ap.cat.1', t: 'Visualización del catálogo de artículos (incluye búsqueda y filtrado)' }, { id: 'ap.cat.2', t: 'Actualizar / editar descripciones manuales o presentación del artículo' }] },
+  { id: 'ap.conf', name: 'Configuración de Promociones', existing: true, items: [{ id: 'ap.conf.1', t: 'Visualización del módulo de configuración de promociones (incluye búsqueda y filtrado)' }, { id: 'ap.conf.2', t: 'Creación de nuevas promociones' }, { id: 'ap.conf.3', t: 'Edición de promociones existentes' }, { id: 'ap.conf.4', t: 'Clonación de promociones existentes' }, { id: 'ap.conf.5', t: 'Cancelación de promociones publicadas' }] },
+  { id: 'vd.adm', name: 'Validación de Diseños · Administración', existing: false, open: true, items: [
+    { id: 'vd.cal.view', t: 'Visualización del calendario de validación (periodos y ventanas N)', g: 'Calendario de validación' },
+    { id: 'vd.cal.edit', t: 'Editar periodos y ventanas de validación (N apertura / N cierre)', g: 'Calendario de validación' },
+    { id: 'vd.cal.close', t: 'Cerrar / reabrir ventanas de validación', g: 'Calendario de validación' },
+    { id: 'vd.cal.year', t: 'Configurar número de periodos del año y origen de fechas', g: 'Calendario de validación' },
+    { id: 'vd.proc.view', t: 'Visualización del catálogo de procesos y matriz de insumos', g: 'Procesos e insumos' },
+    { id: 'vd.proc.edit', t: 'Alta y edición de procesos, insumos obligatorios y pasos del flujo', g: 'Procesos e insumos' },
+    { id: 'vd.proc.deact', t: 'Desactivar un proceso para un periodo', g: 'Procesos e insumos' },
+    { id: 'vd.umbral.view', t: 'Visualización del umbral de coincidencia e historial', g: 'Umbral de coincidencia' },
+    { id: 'vd.umbral.edit', t: 'Modificar umbral global y sobreescrituras por proceso / campo', g: 'Umbral de coincidencia' },
+    { id: 'vd.reglas.view', t: 'Visualización de conjuntos de reglas y versiones', g: 'Reglas de validación' },
+    { id: 'vd.reglas.edit', t: 'Crear, editar y desactivar reglas (genera nueva versión)', g: 'Reglas de validación' },
+    { id: 'vd.reglas.export', t: 'Exportar el conjunto de reglas vigente', g: 'Reglas de validación' },
+    { id: 'vd.err.view', t: 'Visualización del catálogo de errores y severidades', g: 'Tipología de errores' },
+    { id: 'vd.err.edit', t: 'Alta y edición de tipos de error y niveles de severidad', g: 'Tipología de errores' },
+  ] },
+  { id: 'vd.op', name: 'Validación de Diseños · Operación', existing: false, open: false, items: [
+    { id: 'vd.op.insumo', t: 'Cargar insumo (Lista de Producción / Reporte de Promociones)' },
+    { id: 'vd.op.diseno', t: 'Cargar diseño y nuevas versiones' },
+    { id: 'vd.op.bandejaimp', t: 'Consultar bandeja de la imprenta (alcance: propia imprenta)' },
+    { id: 'vd.op.ejecutar', t: 'Ejecutar ciclo de validación' },
+    { id: 'vd.op.bandeja', t: 'Trabajar la bandeja de validación' },
+    { id: 'vd.op.aprobar', t: 'Aprobar con excepción justificada' },
+    { id: 'vd.op.rechazar', t: 'Rechazar diseño' },
+    { id: 'vd.op.cerrar', t: 'Cerrar ciclo y liberar a impresión' },
+    { id: 'vd.op.banco', t: 'Consultar banco de imágenes' },
+    { id: 'vd.op.reportes', t: 'Consultar reportes y dashboard' },
+    { id: 'vd.op.bitacora', t: 'Consultar bitácora del módulo' },
+  ] },
+] };
+const VIEWERS = [
+  { id: 'admin', name: 'Mariana López', role: 'admin', id2: '4021873' },
+  { id: 'coord', name: 'Diego Ramírez', role: 'coord', id2: '4103311' },
+  { id: 'valid', name: 'Paola Ruiz', role: 'valid', id2: '4118820' },
+  { id: 'imp', name: 'Carlos Vega · Milenio', role: 'imp', id2: 'EXT-0117' },
+  { id: 'consulta', name: 'Luis Ortega', role: 'consulta', id2: '3877012' },
+];
+
+let S = buildState();
+let route = 'cal';
+let ui = { calYear: 2026, calFilters: { period: '', proc: '', status: '' }, calSearch: '', calShowFilters: false, procSel: 'nac', procTab: 'cfg', ruleSet: null, ruleFilterProc: '', errTab: 'cat', errFilters: { cat: '', sev: '' }, roleSel: 'admin', roleTab: 'perms', roleDirty: null, accOpen: { 'vd.adm': true } };
+
+const viewer = () => VIEWERS.find(v => v.id === S.viewer);
+const viewerName = () => viewer().name.split(' · ')[0];
+const can = perm => !!S.roles[viewer().role].perms[perm];
+const procName = id => (S.procs.find(p => p.id === id) || {}).name || id;
+function logEvent(mod, action, obj, before, after, motivo, type = 'cambio') {
+  S.log.unshift({ ts: nowStr(), user: viewerName(), mod, action, obj, before, after, motivo, type });
+}
+function blocked(action, obj, mod) {
+  logEvent(mod, `Intento de acción no autorizada: ${action}`, obj, '—', '—', `Rol ${S.roles[viewer().role].name} sin permiso`, 'bloqueado');
+  toast(`${ICON.lock} <span>Acción no autorizada para <b>${S.roles[viewer().role].name}</b>. El intento quedó registrado en la bitácora.</span>`, 'err', 4200);
+}
+
+/* ===================== ventanas: cálculo ===================== */
+function periodOf(year, pid) { return (S.periods[year] || []).find(p => p.id === pid); }
+function winDates(w) { const p = periodOf(w.year, w.period); return { open: addDays(p.start, w.nOpen), close: addDays(p.start, w.nClose), p }; }
+function winStatus(w) {
+  const { open, close, p } = winDates(w);
+  if (w.manual === 'closed') return 'Cerrada';
+  if (TODAY < open) return 'Programada';
+  if (TODAY <= close) return 'Abierta';
+  return 'Cerrada';
+}
+const periodClosed = p => p.start <= TODAY; // periodo ya iniciado en tienda → solo consulta
+const statusChip = s => s === 'Abierta' ? chip('Abierta', 'green') : s === 'Programada' ? chip('Programada', 'grey') : chip('Cerrada', 'dark');
+
+/* ===================== navegación ===================== */
+const NAV_APRIX = [
+  { id: 'apcal', ic: 'cal', t: 'Calendario Promocional' }, { id: 'promo', ic: 'promo', t: 'Promociones', chev: true }, { id: 'regp', ic: 'rules', t: 'Reglas promocionales', chev: true },
+  { id: 'catm', ic: 'book', t: 'Catalogos Maestros', chev: true }, { id: 'esp', ic: 'store', t: 'Espacios y Tiendas', chev: true }, { id: 'pop', ic: 'box', t: 'Pedidos y Material POP', chev: true },
+  { id: 'rep', ic: 'report', t: 'Reportes', chev: true }, { id: 'hist', ic: 'hist', t: 'Historial de Cambios', chev: true },
+];
+const NAV_VD = [
+  { sec: 'Administración' },
+  { id: 'cal', t: 'Calendario de validación', hu: 'VD-1.1', perm: 'vd.cal.view' },
+  { id: 'proc', t: 'Procesos e insumos', hu: 'VD-1.2', perm: 'vd.proc.view' },
+  { id: 'umbral', t: 'Umbral de coincidencia', hu: 'VD-1.3', perm: 'vd.umbral.view' },
+  { id: 'reglas', t: 'Reglas de validación', hu: 'VD-1.4', perm: 'vd.reglas.view' },
+  { id: 'err', t: 'Tipología de errores', hu: 'VD-1.5', perm: 'vd.err.view' },
+  { sec: 'Operación' },
+  { id: 'x1', t: 'Insumos del periodo', hu: 'M2', soon: true }, { id: 'x2', t: 'Diseños', hu: 'M3', soon: true }, { id: 'x3', t: 'Ciclo de validación', hu: 'M4', soon: true },
+  { id: 'x4', t: 'Bandeja de validación', hu: 'M6', soon: true }, { id: 'x5', t: 'Banco de imágenes', hu: 'M5', soon: true }, { id: 'x6', t: 'Reportes y bitácora', hu: 'M8', soon: true },
+];
+function renderNav() {
+  const n = $('#nav'); let h = '';
+  for (const it of NAV_APRIX) h += `<button class="nav-item" type="button" data-aprix="${it.id}"><span class="ic">${ICON[it.ic]}</span><span class="lbl">${it.t}</span>${it.chev ? `<span class="chev">${ICON.chev}</span>` : ''}</button>`;
+  h += `<button class="nav-item ${route === 'roles' ? 'active' : ''}" type="button" data-route="roles"><span class="ic">${ICON.users}</span><span class="lbl">Roles y Usuarios</span></button>`;
+  h += `<button class="nav-item open" type="button" data-toggle="vd"><span class="ic">${ICON.shield}</span><span class="lbl">Validación de Diseños</span><span class="chev">${ICON.chev}</span></button>`;
+  h += `<div class="nav-sub" id="vdsub">`;
+  for (const it of NAV_VD) {
+    if (it.sec) { h += `<div class="nav-sec">${it.sec}</div>`; continue; }
+    const dis = it.soon || (it.perm && !can(it.perm));
+    h += `<button class="nav-item ${route === it.id ? 'active' : ''} ${dis ? 'disabled' : ''} ${it.soon ? 'soon' : ''}" type="button" data-route="${it.id}" ${it.soon ? 'title="Módulo fuera de este wireframe"' : ''}><span class="lbl">${it.t}</span><span class="hu">${it.soon ? 'próx.' : it.hu}</span></button>`;
+  }
+  h += `</div>`;
+  n.innerHTML = h;
+  $$('[data-route]', n).forEach(b => b.onclick = () => {
+    const r = b.dataset.route; const item = NAV_VD.find(x => x.id === r);
+    if (item && item.soon) { toast('Este submódulo pertenece a otro módulo del backlog (fuera del alcance de este wireframe).', 'warn'); return; }
+    if (item && item.perm && !can(item.perm)) { blocked('Acceder a ' + item.t, item.t, item.t); return; }
+    go(r);
+  });
+  $$('[data-aprix]', n).forEach(b => b.onclick = () => toast('Módulo existente de Aprix (fuera de este wireframe).', 'warn'));
+  $('[data-toggle="vd"]').onclick = e => { e.currentTarget.classList.toggle('open'); $('#vdsub').style.display = e.currentTarget.classList.contains('open') ? '' : 'none'; };
+  const v = viewer(); $('#ucName').textContent = v.name.split(' · ')[0]; $('#ucRole').textContent = `${S.roles[v.role].name} · ${v.id2}`;
+}
+function go(r) { route = r; render(); }
+function render() { renderNav(); const m = $('#main'); m.innerHTML = ''; ({ cal: renderCal, proc: renderProc, umbral: renderUmbral, reglas: renderReglas, err: renderErr, roles: renderRoles }[route] || renderCal)(m); renderHU(); window.scrollTo(0, 0); }
+const crumb = (t) => `<div class="crumb"><span class="home">${ICON.home}</span><span>Validación de Diseños</span><span class="sep">›</span><span>Administración</span><span class="sep">›</span><span class="cur">${t}</span></div>`;
+const crumb1 = (t) => `<div class="crumb"><span class="home">${ICON.home}</span><span class="cur">${t}</span></div>`;
+function noAccess(m, t) { m.innerHTML = crumb(t) + `<div class="noaccess"><h2>Sin acceso a este submódulo</h2><p>Tu rol <b>${S.roles[viewer().role].name}</b> no tiene el permiso de visualización de este submódulo. Solicítalo al Administrador; los intentos de acción no autorizada quedan registrados en la bitácora.</p></div>`; }
+
+/* ===================== 1. Calendario de validación (VD-1.1) ===================== */
+function renderCal(m) {
+  if (!can('vd.cal.view')) return noAccess(m, 'Calendario de validación');
+  const year = ui.calYear; const per = S.periods[year] || [];
+  const cur = per.find(p => p.start <= TODAY && TODAY <= p.end);
+  const nxt = per.find(p => p.start > TODAY);
+  const openWins = S.windows.filter(w => w.year === year && winStatus(w) === 'Abierta');
+  const nextClose = openWins.map(w => ({ w, d: winDates(w).close })).sort((a, b) => a.d - b.d)[0];
+  const kpis = year === 2026 ? `<div class="kpis">
+    <div class="kpi"><div class="k">Hoy</div><div class="v tnum">${fmt(TODAY)}</div><div class="s">${DIAS[TODAY.getDay()]}</div></div>
+    <div class="kpi"><div class="k">Periodo en curso</div><div class="v">${cur ? cur.id + ' · ' + year : '—'}</div><div class="s">${cur ? `${fmtS(cur.start)} → ${fmt(cur.end)} · vigente en tienda` : ''}</div></div>
+    <div class="kpi hl"><div class="k">Periodo en validación</div><div class="v">${nxt ? nxt.id + ' · ' + year : '—'}</div><div class="s">${nxt ? `${fmtS(nxt.start)} → ${fmt(nxt.end)} · inicia en ${dayDiff(nxt.start, TODAY)} días · ${openWins.length} ventanas abiertas` : ''}</div></div>
+    <div class="kpi"><div class="k">Próximo cierre de ventana</div><div class="v tnum">${nextClose ? fmt(nextClose.d) : '—'}</div><div class="s">${nextClose ? `${procName(nextClose.w.proc)} · N${nextClose.w.nClose} · <b>quedan ${dayDiff(nextClose.d, TODAY)} días</b>` : 'Sin ventanas abiertas'}</div></div>
+  </div>` : '';
+  const rows = S.windows.filter(w => w.year === year).filter(w => {
+    const f = ui.calFilters; const st = winStatus(w);
+    if (f.period && w.period !== f.period) return false; if (f.proc && w.proc !== f.proc) return false; if (f.status && st !== f.status) return false;
+    if (ui.calSearch) { const q = ui.calSearch.toLowerCase(); if (!(`${w.period} ${procName(w.proc)} ${st} ${w.id}`.toLowerCase().includes(q))) return false; }
+    return true;
+  }).sort((a, b) => { const o = { Abierta: 0, Programada: 1, Cerrada: 2 }; return (o[winStatus(a)] - o[winStatus(b)]) || a.period.localeCompare(b.period) || a.id - b.id; });
+  const editable = can('vd.cal.edit'); const closable = can('vd.cal.close');
+  const tbody = rows.length ? rows.map(w => {
+    const { open, close, p } = winDates(w); const st = winStatus(w); const locked = periodClosed(p);
+    const acts = [];
+    if (!locked && editable) acts.push(`<button class="btn pill neutral" type="button" data-edit="${w.id}">Editar</button>`);
+    if (!locked && closable && st !== 'Cerrada') acts.push(`<button class="btn pill" type="button" data-close="${w.id}">Cerrar</button>`);
+    if (!locked && closable && w.manual === 'closed') acts.push(`<button class="btn pill ok" type="button" data-reopen="${w.id}">Reabrir</button>`);
+    if (can('vd.op.ejecutar') || can('vd.cal.edit')) acts.push(`<button class="btn xs ghost" type="button" data-sim="${w.id}" title="Simular ejecución de la validación de este proceso en este periodo" aria-label="Simular ejecución">▶</button>`);
+    return `<tr class="${locked ? 'dim' : ''}"><td class="b tnum">${w.period} · ${w.year}${locked ? `<span class="sub">${ICON.lock} solo consulta</span>` : ''}</td><td>${procName(w.proc)}</td>
+      <td class="tnum">N${w.nOpen}</td><td class="tnum">N${w.nClose}</td><td class="tnum">${fmt(open)}</td><td class="tnum">${fmt(close)}</td><td>${statusChip(st)}${w.manual === 'closed' ? `<span class="sub">manual · ${esc(w.motivo)}</span>` : ''}</td><td class="acts">${acts.join('')}</td></tr>`;
+  }).join('') : `<tr><td colspan="8" class="empty">${year === 2027 ? 'Sin ventanas configuradas para 2027. Las ventanas se generan a partir de la fecha de inicio de cada periodo del Calendario Promocional de Aprix y las N por defecto de cada proceso.' : 'Sin resultados para los filtros aplicados.'}${year === 2027 && editable ? `<div class="mt"><button class="btn primary" type="button" id="genYear">Generar ventanas 2027 desde procesos</button></div>` : ''}</td></tr>`;
+
+  m.innerHTML = crumb('Calendario de validación') + `
+  <div class="pagehead"><div><h1>Calendario de validación</h1><div class="sub">Periodos promocionales activos y ventanas (N de apertura y cierre) en las que puede ejecutarse la validación de diseños, por proceso. Las fechas base provienen del Calendario Promocional de Aprix.</div></div>
+    <div class="actions">${pin('07')}<button class="btn light" type="button" id="dlCal">${ICON.down} Descargar reporte</button>${can('vd.cal.year') ? `<button class="btn ghost" type="button" id="cfgYear">${ICON.gear} Configuración anual ${pin('02')}</button>` : ''}</div></div>
+  ${banner('info', `<b>Origen de fechas:</b> Calendario Promocional Aprix · ${S.periodsPerYear} periodos/año · última sincronización 22/09/2026 06:00. Cada fecha de ventana se deriva aplicando la N sobre la fecha de inicio del periodo y se recalcula si cambia la N o la fecha de inicio. ${pin('04')}`)}
+  <div style="height:18px"></div>${kpis}
+  <div class="toolbar"><div class="search">${ICON.search}<input id="calSearch" placeholder="Buscar…" value="${esc(ui.calSearch)}" aria-label="Buscar en el calendario"></div><span class="count">${rows.length} resultados</span><span class="spacer"></span>
+    <div class="segment" id="yearSeg">${[2025, 2026, 2027].map(y => `<button type="button" class="${y === year ? 'on' : ''}" data-year="${y}">${y}</button>`).join('')}</div>
+    <button class="btn ghost icon" type="button" id="calFilterBtn" aria-label="Filtros">${ICON.filter}</button></div>
+  <div class="grid ${ui.calShowFilters ? 'g-side-r' : ''}">
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Periodo · año ${pin('01')}</th><th>Proceso ${pin('03')}</th><th>N apertura</th><th>N cierre</th><th>Apertura</th><th>Cierre</th><th>Estatus</th><th></th></tr></thead><tbody>${tbody}</tbody></table></div>
+    ${ui.calShowFilters ? `<aside class="filters" id="calFilters"><h3>Filtros <button class="btn ghost icon" type="button" id="calFilterClose" aria-label="Cerrar filtros">${ICON.close}</button></h3>
+      <div class="field"><label>Año</label><select class="sel" id="fYear">${[2025, 2026, 2027].map(y => `<option ${y === year ? 'selected' : ''}>${y}</option>`).join('')}</select></div>
+      <div class="field"><label>Periodo</label><select class="sel" id="fPeriod"><option value="">Todos</option>${per.map(p => `<option value="${p.id}" ${ui.calFilters.period === p.id ? 'selected' : ''}>${p.id} · ${year}</option>`).join('')}</select></div>
+      <div class="field"><label>Proceso</label><select class="sel" id="fProc"><option value="">Todos</option>${S.procs.map(p => `<option value="${p.id}" ${ui.calFilters.proc === p.id ? 'selected' : ''}>${p.name}</option>`).join('')}</select></div>
+      <div class="field"><label>Estatus</label><select class="sel" id="fStatus"><option value="">Todos</option>${['Programada', 'Abierta', 'Cerrada'].map(s => `<option ${ui.calFilters.status === s ? 'selected' : ''}>${s}</option>`).join('')}</select></div>
+      <div class="fbtns"><button class="btn danger-link" type="button" id="fClear">Borrar</button><button class="btn primary" type="button" id="fApply">Aplicar</button></div></aside>` : ''}
+  </div>
+  <div class="mt small muted">${ICON.lock} Los periodos ya iniciados en tienda se consultan pero no se editan. ${pin('08')} · Todo cambio queda en la bitácora con usuario, fecha, valor anterior, valor nuevo y motivo. ${pin('07')}</div>`;
+
+  $('#dlCal').onclick = () => toast(`${ICON.down} <span>Reporte descargado: <b>Calendario_validacion_${year}.xlsx</b> (simulación)</span>`);
+  $('#calSearch').oninput = e => { ui.calSearch = e.target.value; render(); $('#calSearch').focus(); const v = $('#calSearch').value; $('#calSearch').setSelectionRange(v.length, v.length); };
+  $$('#yearSeg button').forEach(b => b.onclick = () => { ui.calYear = +b.dataset.year; ui.calFilters.period = ''; render(); });
+  $('#calFilterBtn').onclick = () => { ui.calShowFilters = !ui.calShowFilters; render(); };
+  if (ui.calShowFilters) {
+    $('#calFilterClose').onclick = () => { ui.calShowFilters = false; render(); };
+    $('#fApply').onclick = () => { ui.calYear = +$('#fYear').value; ui.calFilters = { period: $('#fPeriod').value, proc: $('#fProc').value, status: $('#fStatus').value }; render(); };
+    $('#fClear').onclick = () => { ui.calFilters = { period: '', proc: '', status: '' }; render(); };
+  }
+  if ($('#cfgYear')) $('#cfgYear').onclick = openYearConfig;
+  if ($('#genYear')) $('#genYear').onclick = () => openModal({ title: 'Generar ventanas 2027', body: `<p>Se crearán <b>${S.periodsPerYear} × ${S.procs.length} = ${S.periodsPerYear * S.procs.length} ventanas</b> en estatus «Programada», usando la fecha de inicio de cada periodo del Calendario Promocional de Aprix y las N por defecto de cada proceso (${S.procs.map(p => `${p.name} N${p.nOpen}/N${p.nClose}`).join(' · ')}).</p><p class="muted">Podrás ajustar cualquier ventana después; cada ajuste queda registrado.</p>`, confirm: 'Generar', onConfirm: () => { S.periods[2027] = periodsFor(2027, S.periodsPerYear); let id = Math.max(...S.windows.map(w => w.id)) + 1; for (const p of S.periods[2027]) for (const pr of S.procs) S.windows.push({ id: id++, year: 2027, period: p.id, proc: pr.id, nOpen: pr.nOpen, nClose: pr.nClose, manual: null, motivo: '' }); logEvent('Calendario de validación', 'Generación de ventanas', '2027', '—', `${S.periodsPerYear * S.procs.length} ventanas`, 'Desde N por defecto de procesos'); toast('Ventanas 2027 generadas.'); render(); } });
+  $$('[data-edit]').forEach(b => b.onclick = () => openEditWindow(+b.dataset.edit));
+  $$('[data-close]').forEach(b => b.onclick = () => closeWindow(+b.dataset.close));
+  $$('[data-reopen]').forEach(b => b.onclick = () => reopenWindow(+b.dataset.reopen));
+  $$('[data-sim]').forEach(b => b.onclick = () => simulateRun(+b.dataset.sim));
+}
+function openYearConfig() {
+  const per = S.periods[2026];
+  openModal({ title: 'Configuración anual del calendario', wide: true, confirm: 'Guardar', body: `
+    <div class="fgrid"><div class="field"><label>Periodos por año ${pin('02')}</label><input class="inp" id="ppy" type="number" min="1" max="26" value="${S.periodsPerYear}"><div class="hint">Valor por defecto 13. Un cambio aplica a la generación de ventanas del siguiente año; no modifica periodos ya publicados.</div></div>
+    <div class="field"><label>Origen de fechas de periodo</label><select class="sel" id="src"><option>Calendario Promocional Aprix (sincronizado)</option><option>Calendario propio del módulo</option></select><div class="hint">Reuso evidente: Aprix ya administra P01–P13 para PIEP y GDP. A confirmar con el Tech Lead.</div></div></div>
+    <div class="tblwrap" style="max-height:300px;overflow:auto"><table class="tbl"><thead><tr><th>Periodo</th><th>Inicio</th><th>Fin</th><th>Ventanas configuradas</th></tr></thead><tbody>${per.map(p => `<tr><td class="b">${p.id} · 2026</td><td class="tnum">${fmt(p.start)}</td><td class="tnum">${fmt(p.end)}</td><td>${S.windows.filter(w => w.year === 2026 && w.period === p.id).length || '—'}</td></tr>`).join('')}</tbody></table></div>`,
+    onConfirm: () => { const v = +$('#ppy').value; if (v !== S.periodsPerYear) { logEvent('Calendario de validación', 'Cambio de periodos por año', 'Configuración anual', String(S.periodsPerYear), String(v), 'Aplica a la generación del siguiente año'); S.periodsPerYear = v; toast(`Periodos por año: ${v}. Aplica al siguiente año.`); render(); } else toast('Sin cambios.', 'warn'); } });
+}
+function openEditWindow(id) {
+  const w = S.windows.find(x => x.id === id); const { p } = winDates(w);
+  const calc = () => { const nO = +$('#eNO').value, nC = +$('#eNC').value; $('#dvOpen').textContent = fmt(addDays(p.start, nO)); $('#dvClose').textContent = fmt(addDays(p.start, nC)); $('#dWarn').hidden = nO < nC; };
+  openDrawer({ title: `Editar ventana · ${w.period} · ${procName(w.proc)}`, sub: `Fecha de inicio del periodo: ${fmt(p.start)} (Calendario Promocional Aprix)`, body: `
+    <div class="fgrid"><div class="field"><label>Periodo</label><input class="inp" readonly value="${w.period} · ${w.year}"></div><div class="field"><label>Proceso</label><input class="inp" readonly value="${procName(w.proc)}"></div>
+    <div class="field"><label>N de apertura ${pin('03')}</label><input class="inp" id="eNO" type="number" max="0" value="${w.nOpen}"><div class="hint">Días respecto al inicio del periodo (negativo = antes).</div></div>
+    <div class="field"><label>N de cierre</label><input class="inp" id="eNC" type="number" max="0" value="${w.nClose}"></div></div>
+    <div class="derived"><span>Fecha de apertura derivada ${pin('04')}</span><b id="dvOpen" class="tnum"></b></div><div class="derived"><span>Fecha de cierre derivada</span><b id="dvClose" class="tnum"></b></div>
+    <div id="dWarn" hidden>${banner('red', 'La N de apertura debe ser anterior a la N de cierre.', 'warn')}</div>
+    <div class="field"><label>Motivo del cambio ${pin('07')}</label><textarea class="ta" id="eMot" placeholder="Ej.: Plazas piden dos días más de ventana"></textarea></div>
+    ${banner('amber', 'La publicación exige confirmación y afecta de inmediato a las tareas y notificaciones programadas del periodo. ' + pin('05'), 'warn')}`,
+    footer: `<button class="btn ghost" type="button" id="eCancel">Cancelar</button><button class="btn primary" type="button" id="eSave">Guardar cambios</button>` });
+  calc(); $('#eNO').oninput = calc; $('#eNC').oninput = calc; $('#eCancel').onclick = closeDrawer;
+  $('#eSave').onclick = () => {
+    const nO = +$('#eNO').value, nC = +$('#eNC').value, mot = $('#eMot').value.trim();
+    if (nO >= nC) return toast('La N de apertura debe ser anterior a la N de cierre.', 'err');
+    if (nO === w.nOpen && nC === w.nClose) return toast('Sin cambios.', 'warn');
+    if (!mot) return toast('Indica el motivo del cambio.', 'err');
+    openModal({ title: 'Publicar cambio de ventana', body: `<p><b>${w.period} · ${w.year} — ${procName(w.proc)}</b></p><dl class="kv"><dt>N apertura</dt><dd>N${w.nOpen} → <b>N${nO}</b> (${fmt(addDays(p.start, nO))})</dd><dt>N cierre</dt><dd>N${w.nClose} → <b>N${nC}</b> (${fmt(addDays(p.start, nC))})</dd><dt>Motivo</dt><dd>${esc(mot)}</dd></dl>${banner('amber', 'Al confirmar, se reprograman las tareas y notificaciones del periodo para este proceso (recordatorios a imprentas y validadores).', 'warn')}`, confirm: 'Confirmar y publicar', onConfirm: () => { logEvent('Calendario de validación', 'Edición de ventana', `${w.period} · ${procName(w.proc)}`, `N${w.nOpen} / N${w.nClose}`, `N${nO} / N${nC}`, mot); w.nOpen = nO; w.nClose = nC; closeDrawer(); toast('Ventana publicada. Tareas y notificaciones reprogramadas.'); render(); } });
+  };
+}
+function closeWindow(id) {
+  const w = S.windows.find(x => x.id === id);
+  openModal({ title: 'Cerrar ventana de validación', danger: true, confirm: 'Cerrar ventana', body: `<p>Se cerrará la ventana de <b>${procName(w.proc)}</b> para <b>${w.period} · ${w.year}</b>. Ninguna validación podrá ejecutarse para este proceso hasta que se reabra.</p><div class="field"><label>Motivo</label><textarea class="ta" id="cMot" placeholder="Motivo del cierre"></textarea></div>`, onConfirm: () => { const mot = $('#cMot').value.trim(); if (!mot) { toast('Indica el motivo.', 'err'); return false; } logEvent('Calendario de validación', 'Cierre manual de ventana', `${w.period} · ${procName(w.proc)}`, winStatus(w), 'Cerrada', mot); w.manual = 'closed'; w.motivo = mot; toast('Ventana cerrada.'); render(); } });
+}
+function reopenWindow(id) {
+  const w = S.windows.find(x => x.id === id);
+  openModal({ title: 'Reabrir ventana de validación', confirm: 'Reabrir', body: `<p>Se reabrirá la ventana de <b>${procName(w.proc)}</b> para <b>${w.period} · ${w.year}</b>; el estatus volverá a calcularse a partir de las fechas derivadas.</p><div class="field"><label>Motivo</label><textarea class="ta" id="rMot"></textarea></div>`, onConfirm: () => { const mot = $('#rMot').value.trim(); if (!mot) { toast('Indica el motivo.', 'err'); return false; } logEvent('Calendario de validación', 'Reapertura de ventana', `${w.period} · ${procName(w.proc)}`, 'Cerrada', 'Recalculada', mot); w.manual = null; w.motivo = ''; toast('Ventana reabierta.'); render(); } });
+}
+function simulateRun(id) {
+  const w = S.windows.find(x => x.id === id); const { open, close } = winDates(w); const st = winStatus(w);
+  const inputs = (S.inputs[w.period] || {})[w.proc]; const pr = S.procs.find(p => p.id === w.proc);
+  const missing = inputs ? [pr.lp && !inputs.lp ? 'Lista de Producción' : null, pr.rp && !inputs.rp ? 'Reporte de Promociones' : null, pr.bi && !inputs.bi ? 'Banco de Imágenes' : null].filter(Boolean) : [];
+  const inactive = (S.procInactive[w.period] || []).includes(w.proc);
+  if (st !== 'Abierta') return openModal({ title: 'Ejecución bloqueada', hideConfirm: true, cancel: 'Entendido', body: banner('red', `<b>No es posible ejecutar la validación fuera de la ventana autorizada.</b> ${pin('06')}<br>Periodo: <b>${w.period} · ${w.year}</b> · Proceso: <b>${procName(w.proc)}</b> · Ventana vigente: <b>${fmt(open)} → ${fmt(close)}</b> (N${w.nOpen} / N${w.nClose}) · Estatus: <b>${st}</b>${w.manual === 'closed' ? ` · Cierre manual: ${esc(w.motivo)}` : ''}.`, 'warn') + `<p class="muted small">Código de catálogo: <b>ERR-SIS-002 · Ejecución fuera de ventana</b> (referencia al catálogo de errores).</p>` });
+  if (inactive) return openModal({ title: 'Ejecución bloqueada', hideConfirm: true, cancel: 'Entendido', body: banner('red', `El proceso <b>${procName(w.proc)}</b> está <b>desactivado para ${w.period} · ${w.year}</b>. Su histórico se conserva; puede reactivarse desde Procesos e insumos.`, 'warn') });
+  if (missing.length) return openModal({ title: 'Ejecución bloqueada por insumo', hideConfirm: true, cancel: 'Entendido', body: banner('amber', `La ventana está abierta, pero <b>${procName(w.proc)}</b> no tiene todos sus insumos obligatorios disponibles para <b>${w.period}</b>. Falta: <b>${missing.join(', ')}</b>. (VD-1.2 AC-04 · ERR-INS-001)`, 'warn') });
+  toast(`${ICON.info} <span>Ventana abierta: la validación de <b>${procName(w.proc)}</b> puede ejecutarse (${w.period} · ${fmt(open)} → ${fmt(close)}). Insumos completos.</span>`, 'ok', 4500);
+}
+
+/* ===================== 2. Procesos e insumos (VD-1.2) ===================== */
+function renderProc(m) {
+  if (!can('vd.proc.view')) return noAccess(m, 'Procesos e insumos');
+  const pr = S.procs.find(p => p.id === ui.procSel) || S.procs[0]; ui.procSel = pr.id;
+  const editable = can('vd.proc.edit'); const rs = S.ruleSets.find(r => r.id === pr.rules);
+  const tabs = [['cfg', 'Configuración del proceso'], ['matrix', 'Matriz de insumos'], ['periods', 'Estatus por periodo']];
+  let body = '';
+  if (ui.procTab === 'cfg') {
+    body = `<div class="fgrid">
+      <div class="field"><label>Nombre del proceso</label><input class="inp" id="pName" value="${esc(pr.name)}" ${editable ? '' : 'disabled'}></div>
+      <div class="field"><label>Conjunto de reglas asociado ${pin('02')}</label><select class="sel" id="pRules" ${editable ? '' : 'disabled'}>${S.ruleSets.map(r => `<option value="${r.id}" ${r.id === pr.rules ? 'selected' : ''}>${r.id} · ${r.name} (v${r.version})</option>`).join('')}</select></div>
+      <div class="field full"><label>Descripción</label><textarea class="ta" id="pDesc" ${editable ? '' : 'disabled'}>${esc(pr.desc)}</textarea></div>
+      <div class="field"><label>Insumos obligatorios ${pin('02')}</label>
+        <div class="stack" style="gap:8px;margin-top:4px">${cbHtml(pr.lp, 'Lista de Producción', { dis: !editable, attrs: 'data-pcb="lp"' })}${cbHtml(pr.rp, 'Reporte de Promociones', { dis: !editable, attrs: 'data-pcb="rp"' })}${cbHtml(pr.bi, 'Banco de Imágenes', { dis: !editable, attrs: 'data-pcb="bi"' })}</div>
+        <div class="hint mt">Si un insumo obligatorio no está disponible para el periodo, el ciclo de ese proceso no puede iniciar y el sistema indica cuál falta. ${pin('04')}</div></div>
+      <div class="field"><label>Pasos del flujo que aplican</label><div class="stack" style="gap:8px;margin-top:4px">${Object.entries(STEPS).map(([k, t]) => cbHtml(pr.steps.includes(k), t, { dis: !editable || (k === 'print' && !pr.print), attrs: `data-pstep="${k}"` })).join('')}</div></div>
+      <div class="field"><label>Flujo de impresión ${pin('03')}</label><span class="tg ${pr.print ? 'on' : ''} ${editable ? '' : 'dis'}" id="pPrint" role="switch" aria-checked="${pr.print}" tabindex="0"><i></i><span>${pr.print ? 'Sí · genera pasos de impresión y liberación' : 'No · el proceso termina en el dictamen'}</span></span></div>
+      <div class="field"><label>Umbral aplicable</label><div class="row"><select class="sel" id="pThrMode" style="width:auto" ${editable ? '' : 'disabled'}><option value="g" ${pr.threshold == null ? 'selected' : ''}>Global (${S.threshold.global}%)</option><option value="o" ${pr.threshold != null ? 'selected' : ''}>Sobreescritura por proceso</option></select><input class="inp" id="pThr" type="number" min="80" max="100" step="0.5" style="width:110px" value="${pr.threshold ?? S.threshold.global}" ${editable && pr.threshold != null ? '' : 'disabled'}><span class="muted small">%</span></div><div class="hint">La sobreescritura se administra en Umbral de coincidencia (solo Administrador).</div></div>
+      <div class="field"><label>Ventana de validación por defecto</label><div class="row"><span class="inline-num"><span class="muted">Apertura N</span><input class="inp" id="pNO" type="number" max="0" value="${pr.nOpen}" ${editable ? '' : 'disabled'}></span><span class="inline-num"><span class="muted">Cierre N</span><input class="inp" id="pNC" type="number" max="0" value="${pr.nClose}" ${editable ? '' : 'disabled'}></span></div><div class="hint">Semilla para las ventanas de cada periodo en Calendario de validación; las ventanas ya publicadas no cambian.</div></div>
+    </div>
+    ${pr.id === 'rea' ? banner('info', '<b>Reacción</b> se configura sin Lista de Producción y sin flujo de impresión: el motor valida solo contra el Reporte de Promociones y el Banco de Imágenes, y no genera pasos de impresión para sus diseños. ' + pin('03')) : ''}
+    ${editable ? `<div class="savebar"><span class="msg">Los cambios generan una nueva versión del catálogo y aplican al siguiente ciclo de validación.</span><button class="btn ghost" type="button" id="pCancel">Descartar</button><button class="btn primary" type="button" id="pSave">Guardar cambios</button></div>` : banner('grey', `Tu rol <b>${S.roles[viewer().role].name}</b> solo puede consultar el catálogo.`, 'lock')}`;
+  } else if (ui.procTab === 'matrix') {
+    body = `<div class="tblwrap"><table class="tbl matrix"><thead><tr><th>Proceso</th><th class="c">Lista de Producción</th><th class="c">Reporte de Promociones</th><th class="c">Banco de Imágenes</th><th class="c">Flujo de impresión</th><th>Conjunto de reglas</th><th class="c">Umbral</th><th class="c">Ventana (N)</th><th class="c">Estatus</th></tr></thead><tbody>
+      ${S.procs.map(p => { const r = S.ruleSets.find(x => x.id === p.rules); return `<tr class="clickable" data-selp="${p.id}"><td class="b">${p.name}</td><td class="c">${p.lp ? '<span class="tick">✓</span>' : '<span class="cross">—</span>'}</td><td class="c">${p.rp ? '<span class="tick">✓</span>' : '<span class="cross">—</span>'}</td><td class="c">${p.bi ? '<span class="tick">✓</span>' : '<span class="cross">—</span>'}</td><td class="c">${p.print ? '<span class="tick">✓</span>' : '<span class="cross">—</span>'}</td><td>${r ? `${r.id} · v${r.version}` : '—'}</td><td class="c tnum">${p.threshold ?? S.threshold.global}%${p.threshold != null ? ' <span class="chip amber" style="margin-left:4px">override</span>' : ''}</td><td class="c tnum">N${p.nOpen} / N${p.nClose}</td><td class="c">${p.active ? chip('Activo', 'green') : chip('Inactivo', 'grey')}</td></tr>`; }).join('')}
+    </tbody></table></div>
+    <div class="row mt"><span class="muted small">Vista consolidada del catálogo: qué exige cada proceso y con qué se valida. ${pin('02')}</span><span class="spacer"></span><button class="btn light sm" type="button" id="mExport">${ICON.export} Exportar matriz</button></div>`;
+  } else {
+    const pers = ['P10', 'P11', 'P12'];
+    body = `<div class="tblwrap"><table class="tbl"><thead><tr><th>Periodo</th><th>Estatus del proceso</th><th>Lista de Producción</th><th>Reporte de Promociones</th><th>Banco de Imágenes</th><th>¿Puede iniciar el ciclo?</th><th></th></tr></thead><tbody>
+      ${pers.map(pid => { const inp = (S.inputs[pid] || {})[pr.id] || {}; const inactive = (S.procInactive[pid] || []).includes(pr.id); const p = periodOf(2026, pid); const locked = periodClosed(p) && pid !== 'P10';
+        const need = [['lp', 'Lista de Producción', pr.lp], ['rp', 'Reporte de Promociones', pr.rp], ['bi', 'Banco de Imágenes', pr.bi]];
+        const cell = (k, req) => !req ? '<span class="chip grey">No aplica</span>' : inp[k] ? chip('Disponible', 'green') : chip('Faltante', 'red');
+        const missing = need.filter(([k, , req]) => req && !inp[k]).map(x => x[1]);
+        const canStart = inactive ? chip('No · proceso desactivado', 'grey') : missing.length ? `${chip('No', 'red')}<span class="sub">Falta: ${missing.join(', ')}</span>` : chip('Sí', 'green');
+        const act = can('vd.proc.deact') && p.start > TODAY ? (inactive ? `<button class="btn pill ok" type="button" data-react="${pid}">Reactivar</button>` : `<button class="btn pill" type="button" data-deact="${pid}">Desactivar para el periodo</button>`) : '';
+        return `<tr><td class="b">${pid} · 2026<span class="sub">${fmtS(p.start)} → ${fmt(p.end)}</span></td><td>${inactive ? chip('Inactivo en el periodo', 'grey') : chip('Activo', 'green')}</td><td>${cell('lp', pr.lp)}</td><td>${cell('rp', pr.rp)}</td><td>${cell('bi', pr.bi)}</td><td>${canStart} ${pin('04')}</td><td class="acts">${act}</td></tr>`; }).join('')}
+    </tbody></table></div>
+    <div class="mt">${banner('info', 'Desactivar un proceso para un periodo no lo borra del catálogo ni de su histórico de validaciones: solo impide iniciar su ciclo en ese periodo. ' + pin('05'))}</div>
+    <div class="mt small muted">Los resultados, incidencias y reportes del módulo quedan clasificados por proceso y son filtrables por él. ${pin('06')}</div>`;
+  }
+  m.innerHTML = crumb('Procesos e insumos') + `
+  <div class="pagehead"><div><h1>Procesos e insumos</h1><div class="sub">Catálogo de procesos promocionales y, para cada uno, los insumos obligatorios, los pasos del flujo, el conjunto de reglas y el umbral con los que el motor valida sus diseños.</div></div>
+    <div class="actions">${editable ? `<button class="btn primary" type="button" id="newProc">${ICON.plus} Nuevo proceso ${pin('01')}</button>` : ''}</div></div>
+  <div class="grid g-side">
+    <div class="card"><div class="card-h">Procesos promocionales <span class="meta">${S.procs.length} procesos</span></div>
+      <div class="rolelist">${S.procs.map(p => `<button class="roleitem ${p.id === pr.id ? 'on' : ''}" type="button" data-selp="${p.id}"><span class="dot ${p.active ? 'green' : 'grey'}"></span>${p.name}${p.id === 'rea' ? '<span class="nw">sin impresión</span>' : ''}</button>`).join('')}</div></div>
+    <div class="card"><div class="card-h">Proceso · ${pr.name} <span class="meta">${rs ? `Reglas ${rs.id} v${rs.version}` : ''} · Umbral ${pr.threshold ?? S.threshold.global}%</span></div>
+      <div class="card-b"><div class="tabs sm">${tabs.map(([k, t]) => `<button class="tab ${ui.procTab === k ? 'on' : ''}" type="button" data-ptab="${k}">${t}</button>`).join('')}</div>${body}</div></div>
+  </div>`;
+  $$('[data-selp]').forEach(b => b.onclick = () => { ui.procSel = b.dataset.selp; if (ui.procTab === 'matrix') ui.procTab = 'cfg'; render(); });
+  $$('[data-ptab]').forEach(b => b.onclick = () => { ui.procTab = b.dataset.ptab; render(); });
+  if ($('#newProc')) $('#newProc').onclick = () => openDrawer({ title: 'Nuevo proceso promocional', body: `<div class="field"><label>Nombre</label><input class="inp" id="npName" placeholder="Ej.: Temporada"></div><div class="field"><label>Descripción</label><textarea class="ta" id="npDesc"></textarea></div><div class="field"><label>Insumos obligatorios</label><div class="stack" style="gap:8px">${cbHtml(true, 'Lista de Producción', { attrs: 'data-ncb="lp"' })}${cbHtml(true, 'Reporte de Promociones', { attrs: 'data-ncb="rp"' })}${cbHtml(true, 'Banco de Imágenes', { attrs: 'data-ncb="bi"' })}</div></div><div class="fgrid"><div class="field"><label>Flujo de impresión</label><select class="sel" id="npPrint"><option value="1">Sí</option><option value="0">No</option></select></div><div class="field"><label>Conjunto de reglas</label><select class="sel" id="npRules">${S.ruleSets.map(r => `<option value="${r.id}">${r.id} · ${r.name}</option>`).join('')}</select></div><div class="field"><label>N apertura</label><input class="inp" id="npNO" type="number" value="-20"></div><div class="field"><label>N cierre</label><input class="inp" id="npNC" type="number" value="-7"></div></div>`, footer: `<button class="btn ghost" type="button" id="npCancel">Cancelar</button><button class="btn primary" type="button" id="npSave">Crear proceso</button>` }) || setTimeout(() => {
+    $$('[data-ncb]').forEach(c => c.onclick = () => c.classList.toggle('on') || c.classList.toggle('off')); $('#npCancel').onclick = closeDrawer;
+    $('#npSave').onclick = () => { const name = $('#npName').value.trim(); if (!name) return toast('Indica el nombre del proceso.', 'err'); const get = k => $(`[data-ncb="${k}"]`).classList.contains('on'); const id = 'p' + Date.now().toString(36); S.procs.push({ id, name, desc: $('#npDesc').value, lp: get('lp'), rp: get('rp'), bi: get('bi'), print: $('#npPrint').value === '1', rules: $('#npRules').value, threshold: null, nOpen: +$('#npNO').value, nClose: +$('#npNC').value, active: true, steps: $('#npPrint').value === '1' ? ['pre', 'folio', 'img', 'print'] : ['pre', 'folio', 'img'] }); logEvent('Procesos e insumos', 'Alta de proceso', name, '—', 'Creado', 'Nuevo proceso promocional'); ui.procSel = id; closeDrawer(); toast(`Proceso «${name}» creado. Genera sus ventanas desde Calendario de validación.`); render(); };
+  }, 0);
+  if (ui.procTab === 'cfg' && editable) {
+    $$('[data-pcb]').forEach(c => c.onclick = () => { c.classList.toggle('on'); c.classList.toggle('off'); });
+    $$('[data-pstep]').forEach(c => { if (!c.classList.contains('dis')) c.onclick = () => { c.classList.toggle('on'); c.classList.toggle('off'); }; });
+    $('#pPrint').onclick = () => { $('#pPrint').classList.toggle('on'); const on = $('#pPrint').classList.contains('on'); $('#pPrint span').textContent = on ? 'Sí · genera pasos de impresión y liberación' : 'No · el proceso termina en el dictamen'; const st = $('[data-pstep="print"]'); st.classList.toggle('dis', !on); if (!on) { st.classList.remove('on'); st.classList.add('off'); } };
+    $('#pThrMode').onchange = () => { $('#pThr').disabled = $('#pThrMode').value === 'g'; if ($('#pThrMode').value === 'g') $('#pThr').value = S.threshold.global; };
+    $('#pCancel').onclick = () => render();
+    $('#pSave').onclick = () => {
+      const changes = []; const get = k => $(`[data-pcb="${k}"]`).classList.contains('on'); const print = $('#pPrint').classList.contains('on');
+      const nv = { name: $('#pName').value.trim(), desc: $('#pDesc').value, lp: get('lp'), rp: get('rp'), bi: get('bi'), print, rules: $('#pRules').value, nOpen: +$('#pNO').value, nClose: +$('#pNC').value, steps: Object.keys(STEPS).filter(k => $(`[data-pstep="${k}"]`).classList.contains('on')) };
+      const lbl = { lp: 'Lista de Producción', rp: 'Reporte de Promociones', bi: 'Banco de Imágenes' };
+      for (const k of ['lp', 'rp', 'bi']) if (nv[k] !== pr[k]) changes.push(`${lbl[k]}: ${pr[k] ? 'obligatorio' : 'no aplica'} → ${nv[k] ? 'obligatorio' : 'no aplica'}`);
+      if (nv.print !== pr.print) changes.push(`Flujo de impresión: ${pr.print ? 'Sí' : 'No'} → ${nv.print ? 'Sí' : 'No'}`);
+      if (nv.rules !== pr.rules) changes.push(`Conjunto de reglas: ${pr.rules} → ${nv.rules}`);
+      if (nv.nOpen !== pr.nOpen || nv.nClose !== pr.nClose) changes.push(`Ventana por defecto: N${pr.nOpen}/N${pr.nClose} → N${nv.nOpen}/N${nv.nClose}`);
+      if (nv.name !== pr.name) changes.push(`Nombre: ${pr.name} → ${nv.name}`);
+      if (nv.steps.join() !== pr.steps.join()) changes.push('Pasos del flujo actualizados');
+      if (!changes.length) return toast('Sin cambios.', 'warn');
+      openModal({ title: `Guardar cambios · ${pr.name}`, confirm: 'Confirmar', body: `<p>Se creará una nueva versión del catálogo con estos cambios, que aplican al <b>siguiente ciclo de validación</b> (nunca a dictámenes ya emitidos):</p><ul>${changes.map(c => `<li>${esc(c)}</li>`).join('')}</ul><div class="field"><label>Motivo</label><textarea class="ta" id="psMot"></textarea></div>`, onConfirm: () => { const mot = $('#psMot').value.trim(); if (!mot) { toast('Indica el motivo.', 'err'); return false; } logEvent('Procesos e insumos', 'Edición de proceso', pr.name, changes.length + ' atributo(s)', changes.join(' · '), mot); Object.assign(pr, nv); toast('Proceso actualizado. Aplica al siguiente ciclo.'); render(); } });
+    };
+  }
+  if ($('#mExport')) $('#mExport').onclick = () => toast(`${ICON.export} <span>Matriz exportada: <b>Matriz_insumos_procesos.xlsx</b> (simulación)</span>`);
+  $$('[data-deact]').forEach(b => b.onclick = () => { const pid = b.dataset.deact; openModal({ title: `Desactivar ${pr.name} para ${pid} · 2026`, danger: true, confirm: 'Desactivar', body: `<p>El proceso no podrá iniciar su ciclo de validación en <b>${pid} · 2026</b>. Se conserva en el catálogo y mantiene su histórico. ${pin('05')}</p><div class="field"><label>Motivo</label><textarea class="ta" id="dMot"></textarea></div>`, onConfirm: () => { const mot = $('#dMot').value.trim(); if (!mot) { toast('Indica el motivo.', 'err'); return false; } (S.procInactive[pid] = S.procInactive[pid] || []).push(pr.id); logEvent('Procesos e insumos', 'Desactivación por periodo', `${pr.name} · ${pid}`, 'Activo', 'Inactivo', mot); toast(`${pr.name} desactivado para ${pid}.`); render(); } }); });
+  $$('[data-react]').forEach(b => b.onclick = () => { const pid = b.dataset.react; S.procInactive[pid] = (S.procInactive[pid] || []).filter(x => x !== pr.id); logEvent('Procesos e insumos', 'Reactivación por periodo', `${pr.name} · ${pid}`, 'Inactivo', 'Activo', 'Reactivación'); toast(`${pr.name} reactivado para ${pid}.`); render(); });
+}
+
+/* ===================== 3. Umbral de coincidencia (VD-1.3) ===================== */
+function renderUmbral(m) {
+  if (!can('vd.umbral.view')) return noAccess(m, 'Umbral de coincidencia');
+  const editable = can('vd.umbral.edit'); const T = S.threshold;
+  const fieldName = f => f || 'Todo el proceso';
+  m.innerHTML = crumb('Umbral de coincidencia') + `
+  <div class="pagehead"><div><h1>Umbral de coincidencia</h1><div class="sub">Porcentaje mínimo de coincidencia entre el diseño y sus insumos para que un diseño se apruebe automáticamente. Global, con sobreescrituras opcionales por proceso y por campo validado.</div></div>
+    <div class="actions"><button class="btn ${editable ? 'primary' : 'ghost'}" type="button" id="thrEdit" ${editable ? '' : 'aria-disabled="true"'}>${editable ? '' : ICON.lock} Modificar umbral global ${pin('01')}</button></div></div>
+  <div class="grid g-side">
+    <div class="card"><div class="card-h">Umbral global vigente</div><div class="card-b">
+      <div class="bignum tnum">${T.global}<small>%</small></div>
+      <dl class="kv mt"><dt>Aplica desde</dt><dd><b>${T.appliesFrom}</b></dd><dt>Regla de aplicación</dt><dd>Un cambio aplica al siguiente ciclo de validación; nunca recalcula dictámenes ya emitidos. ${pin('03')}</dd><dt>Quién puede modificarlo</dt><dd>Solo el rol <b>Administrador</b>. ${pin('01')}</dd><dt>Valor por defecto</dt><dd>98%</dd></dl>
+      ${editable ? '' : banner('grey', `Tu rol <b>${S.roles[viewer().role].name}</b> puede consultar pero no modificar. Cualquier intento se bloquea y queda registrado. ${pin('04')}`, 'lock')}
+    </div></div>
+    <div class="card"><div class="card-h">Sobreescrituras por proceso y campo ${pin('02')} <span class="meta">${T.overrides.length} vigentes</span>${editable ? `<button class="btn ghost sm" type="button" id="ovAdd">${ICON.plus} Agregar sobreescritura</button>` : ''}</div>
+      <div class="tblwrap" style="border:0;border-radius:0"><table class="tbl"><thead><tr><th>Proceso</th><th>Campo validado</th><th>Umbral</th><th>Aplica desde</th><th></th></tr></thead><tbody>
+        ${T.overrides.map(o => `<tr><td class="b">${procName(o.proc)}</td><td>${fieldName(o.field)}</td><td class="tnum"><b>${o.value}%</b> <span class="muted small">(global ${T.global}%)</span></td><td>${o.from}</td><td class="acts">${editable ? `<button class="btn pill neutral" type="button" data-oved="${o.id}">Editar</button><button class="btn pill" type="button" data-ovdel="${o.id}">Quitar</button>` : ''}</td></tr>`).join('')}
+        ${T.overrides.length ? '' : '<tr><td colspan="5" class="empty">Sin sobreescrituras: todos los procesos usan el umbral global.</td></tr>'}
+      </tbody></table></div>
+      <div class="card-b small muted">Precedencia: campo del proceso → proceso → global. La sobreescritura por campo exige que el campo pertenezca al conjunto de reglas del proceso. <i>Punto abierto con el cliente: confirmar si el umbral se sobreescribe por campo o solo global y por proceso (impacta VD-4.7).</i></div>
+    </div>
+  </div>
+  <div class="card mt"><div class="card-h">Historial de modificaciones ${pin('05')} <span class="meta">usuario · fecha · valor anterior · valor nuevo · periodo de aplicación</span><button class="btn light sm" type="button" id="thrExport">${ICON.export} Exportar</button></div>
+    <div class="tblwrap" style="border:0;border-radius:0"><table class="tbl"><thead><tr><th>Fecha</th><th>Usuario</th><th>Alcance</th><th>Anterior</th><th>Nuevo</th><th>Aplica desde</th><th>Motivo</th></tr></thead><tbody>
+      ${T.history.map(h => `<tr><td class="tnum">${h.ts}</td><td>${h.user}</td><td>${h.scope}</td><td class="tnum">${h.before}</td><td class="tnum b">${h.after}</td><td>${h.from}</td><td class="muted">${esc(h.motivo)}</td></tr>`).join('')}
+    </tbody></table></div></div>
+  ${S.log.some(l => l.mod === 'Umbral de coincidencia' && l.type === 'bloqueado') ? `<div class="mt">${banner('amber', `<b>Intentos bloqueados registrados:</b> ${S.log.filter(l => l.mod === 'Umbral de coincidencia' && l.type === 'bloqueado').map(l => `${l.user} (${l.ts})`).join(' · ')}. Consulta el detalle en la bitácora. ${pin('04')}`, 'lock')}</div>` : ''}`;
+  const nextPeriod = 'P12 · 2026';
+  $('#thrEdit').onclick = () => {
+    if (!editable) return blocked('Modificar umbral global', 'Global', 'Umbral de coincidencia');
+    openDrawer({ title: 'Modificar umbral global', sub: `Vigente ${T.global}% · aplica desde ${T.appliesFrom}`, body: `
+      <div class="field"><label>Nuevo umbral global</label><div class="row"><input class="inp" id="tVal" type="number" min="80" max="100" step="0.5" value="${T.global}" style="width:140px"><span class="muted">%</span><input type="range" min="80" max="100" step="0.5" value="${T.global}" id="tRange" style="flex:1;accent-color:#81001E" aria-label="Umbral"></div></div>
+      ${banner('info', `<b>Aplica a partir del siguiente ciclo de validación (${nextPeriod}).</b> Los dictámenes ya emitidos no se recalculan. ${pin('03')}`)}
+      <div class="field"><label>Motivo</label><textarea class="ta" id="tMot" placeholder="Ej.: Resultado de la calibración del periodo anterior"></textarea></div>`,
+      footer: `<button class="btn ghost" type="button" id="tCancel">Cancelar</button><button class="btn primary" type="button" id="tSave">Guardar</button>` });
+    $('#tRange').oninput = () => $('#tVal').value = $('#tRange').value; $('#tVal').oninput = () => $('#tRange').value = $('#tVal').value; $('#tCancel').onclick = closeDrawer;
+    $('#tSave').onclick = () => { const v = +$('#tVal').value, mot = $('#tMot').value.trim(); if (v === T.global) return toast('Sin cambios.', 'warn'); if (!mot) return toast('Indica el motivo.', 'err'); openModal({ title: 'Confirmar cambio de umbral', body: `<p>Umbral global: <b>${T.global}%</b> → <b>${v}%</b>, vigente desde <b>${nextPeriod}</b>.</p><p class="muted">Motivo: ${esc(mot)}</p>`, onConfirm: () => { T.history.unshift({ ts: nowStr(), user: viewerName(), scope: 'Global', before: T.global + '%', after: v + '%', from: nextPeriod, motivo: mot }); logEvent('Umbral de coincidencia', 'Cambio de umbral global', 'Global', T.global + '%', v + '%', mot); T.global = v; T.appliesFrom = nextPeriod; closeDrawer(); toast(`Umbral global ${v}% · aplica desde ${nextPeriod}.`); render(); } }); };
+  };
+  const ovDrawer = (o) => { const isNew = !o; o = o || { proc: 'nac', field: null, value: T.global };
+    openDrawer({ title: isNew ? 'Agregar sobreescritura' : 'Editar sobreescritura', body: `<div class="fgrid"><div class="field"><label>Proceso</label><select class="sel" id="oProc">${S.procs.map(p => `<option value="${p.id}" ${p.id === o.proc ? 'selected' : ''}>${p.name}</option>`).join('')}</select></div><div class="field"><label>Campo validado</label><select class="sel" id="oField"><option value="">Todo el proceso</option>${FIELDS.map(f => `<option ${f === o.field ? 'selected' : ''}>${f}</option>`).join('')}</select></div><div class="field"><label>Umbral</label><input class="inp" id="oVal" type="number" min="80" max="100" step="0.5" value="${o.value}"></div><div class="field"><label>Aplica desde</label><input class="inp" readonly value="${nextPeriod}"></div></div><div class="field"><label>Motivo</label><textarea class="ta" id="oMot"></textarea></div>`, footer: `<button class="btn ghost" type="button" id="oCancel">Cancelar</button><button class="btn primary" type="button" id="oSave">Guardar</button>` });
+    $('#oCancel').onclick = closeDrawer;
+    $('#oSave').onclick = () => { const mot = $('#oMot').value.trim(); if (!mot) return toast('Indica el motivo.', 'err'); const nv = { proc: $('#oProc').value, field: $('#oField').value || null, value: +$('#oVal').value, from: nextPeriod }; const scope = `${procName(nv.proc)}${nv.field ? ' · ' + nv.field : ''}`; if (isNew) { T.overrides.push({ id: Date.now(), ...nv }); T.history.unshift({ ts: nowStr(), user: viewerName(), scope, before: T.global + '%', after: nv.value + '%', from: nextPeriod, motivo: mot }); logEvent('Umbral de coincidencia', 'Alta de sobreescritura', scope, T.global + '%', nv.value + '%', mot); } else { T.history.unshift({ ts: nowStr(), user: viewerName(), scope, before: o.value + '%', after: nv.value + '%', from: nextPeriod, motivo: mot }); logEvent('Umbral de coincidencia', 'Edición de sobreescritura', scope, o.value + '%', nv.value + '%', mot); Object.assign(o, nv); } closeDrawer(); toast('Sobreescritura guardada.'); render(); };
+  };
+  if ($('#ovAdd')) $('#ovAdd').onclick = () => ovDrawer(null);
+  $$('[data-oved]').forEach(b => b.onclick = () => ovDrawer(T.overrides.find(o => o.id === +b.dataset.oved)));
+  $$('[data-ovdel]').forEach(b => b.onclick = () => { const o = T.overrides.find(x => x.id === +b.dataset.ovdel); openModal({ title: 'Quitar sobreescritura', danger: true, confirm: 'Quitar', body: `<p><b>${procName(o.proc)} · ${fieldName(o.field)}</b> volverá al umbral global (${T.global}%) a partir de ${nextPeriod}.</p>`, onConfirm: () => { T.overrides = T.overrides.filter(x => x !== o); const scope = `${procName(o.proc)}${o.field ? ' · ' + o.field : ''}`; T.history.unshift({ ts: nowStr(), user: viewerName(), scope, before: o.value + '%', after: `${T.global}% (global)`, from: nextPeriod, motivo: 'Sobreescritura retirada' }); logEvent('Umbral de coincidencia', 'Baja de sobreescritura', scope, o.value + '%', 'global', 'Retirada'); toast('Sobreescritura retirada.'); render(); } }); });
+  $('#thrExport').onclick = () => toast(`${ICON.export} <span>Historial exportado (simulación).</span>`);
+}
+
+/* ===================== 4. Reglas de validación (VD-1.4) ===================== */
+const sevChip = s => s === 'Crítica' ? chip('Crítica', 'red') : s === 'Mayor' ? chip('Mayor', 'amber') : s === 'Menor' ? chip('Menor', 'info') : chip(s, 'grey');
+function renderReglas(m) {
+  if (!can('vd.reglas.view')) return noAccess(m, 'Reglas de validación');
+  const editable = can('vd.reglas.edit');
+  if (!ui.ruleSet) {
+    const sets = S.ruleSets.filter(r => !ui.ruleFilterProc || r.procs.includes(ui.ruleFilterProc));
+    m.innerHTML = crumb('Reglas de validación') + `
+    <div class="pagehead"><div><h1>Reglas de validación</h1><div class="sub">Conjuntos de reglas con los que el motor compara cada campo del diseño contra su insumo. Cada cambio genera una nueva versión; cada validación guarda la versión con la que se ejecutó.</div></div>
+      <div class="actions">${editable ? `<button class="btn primary" type="button" id="rsNew">${ICON.plus} Nuevo conjunto</button>` : ''}</div></div>
+    <div class="toolbar"><span class="muted">Filtrar por proceso ${pin('02')}</span><div class="pillrow">${[['', 'Todos'], ...S.procs.map(p => [p.id, p.name])].map(([id, t]) => `<button class="btn ${ui.ruleFilterProc === id ? 'primary' : 'ghost'} sm" type="button" data-rfp="${id}">${t}</button>`).join('')}</div></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Conjunto</th><th>Procesos asociados</th><th>Vigencia (periodos)</th><th>Versión vigente</th><th>Reglas activas</th><th>Suma de pesos</th><th>Estatus</th><th></th></tr></thead><tbody>
+      ${sets.map(r => { const act = r.rules.filter(x => x.active); const sum = act.reduce((a, x) => a + x.weight, 0); return `<tr class="clickable" data-rs="${r.id}"><td class="b">${r.id}<span class="sub">${r.name}</span></td><td>${r.procs.map(p => chip(procName(p), 'outline')).join(' ')}</td><td class="tnum">${r.from} → ${r.to}</td><td><b>v${r.version}</b><span class="sub">${r.versions[0].ts} · ${r.versions[0].user}</span></td><td class="tnum">${act.length}</td><td class="tnum">${sum === 100 ? chip(sum + '%', 'green') : chip(sum + '%', 'amber')}</td><td>${chip(r.status, 'green')}</td><td class="acts"><button class="btn pill neutral" type="button" data-rs="${r.id}">Ver</button>${can('vd.reglas.export') ? `<button class="btn xs ghost" type="button" data-rsx="${r.id}">Exportar</button>` : ''}</td></tr>`; }).join('')}
+    </tbody></table></div>
+    <div class="mt small muted">${pin('05')} Cada validación ejecutada guarda la versión del conjunto con la que corrió; un dictamen histórico siempre puede explicarse. ${pin('07')} El conjunto vigente es consultable y exportable.</div>`;
+    $$('[data-rfp]').forEach(b => b.onclick = () => { ui.ruleFilterProc = b.dataset.rfp; render(); });
+    $$('[data-rs]').forEach(b => b.onclick = e => { e.stopPropagation(); ui.ruleSet = b.dataset.rs; render(); });
+    $$('[data-rsx]').forEach(b => b.onclick = e => { e.stopPropagation(); toast(`${ICON.export} <span>Exportado <b>${b.dataset.rsx}_v${S.ruleSets.find(r => r.id === b.dataset.rsx).version}.xlsx</b> (simulación)</span>`); });
+    if ($('#rsNew')) $('#rsNew').onclick = () => toast('Alta de conjunto: mismo formulario que la edición (nombre, procesos, vigencia). Se detalla en refinamiento.', 'warn');
+    return;
+  }
+  const r = S.ruleSets.find(x => x.id === ui.ruleSet); const act = r.rules.filter(x => x.active); const sum = act.reduce((a, x) => a + x.weight, 0);
+  m.innerHTML = crumb('Reglas de validación') + `
+  <div class="pagehead"><div><button class="btn link sm" type="button" id="rsBack" style="margin-left:-8px">‹ Conjuntos de reglas</button><h1>${r.id} · ${r.name}</h1><div class="sub">Procesos: ${r.procs.map(procName).join(', ')} · Vigencia ${r.from} → ${r.to} · <b>Versión vigente v${r.version}</b> (${r.versions[0].ts}, ${r.versions[0].user}) ${pin('02')}</div></div>
+    <div class="actions"><button class="btn ghost" type="button" id="rsVers">${ICON.hist} Versiones (${r.versions.length}) ${pin('04')}</button>${can('vd.reglas.export') ? `<button class="btn light" type="button" id="rsExp">${ICON.export} Exportar v${r.version} ${pin('07')}</button>` : ''}${editable ? `<button class="btn primary" type="button" id="ruleNew">${ICON.plus} Nueva regla</button>` : ''}</div></div>
+  <div class="kpis"><div class="kpi"><div class="k">Reglas activas</div><div class="v tnum">${act.length}</div><div class="s">${r.rules.length - act.length} desactivadas</div></div><div class="kpi ${sum === 100 ? '' : 'hl'}"><div class="k">Suma de pesos</div><div class="v tnum">${sum}%</div><div class="s">${sum === 100 ? 'Cálculo de coincidencia balanceado' : 'Debe sumar 100% para publicar'}</div></div><div class="kpi"><div class="k">Obligatorias</div><div class="v tnum">${act.filter(x => x.mand).length}</div><div class="s">${act.filter(x => x.sev === 'Crítica').length} críticas</div></div><div class="kpi"><div class="k">Umbral aplicable</div><div class="v tnum">${(S.procs.find(p => p.id === r.procs[0]) || {}).threshold ?? S.threshold.global}%</div><div class="s">según Umbral de coincidencia</div></div></div>
+  <div class="tblwrap"><table class="tbl"><thead><tr><th>Campo del diseño ${pin('01')}</th><th>Campo del insumo</th><th>Comparación</th><th>Tolerancia</th><th>Obligatoria</th><th>Severidad</th><th>Peso</th><th>Estatus</th><th></th></tr></thead><tbody>
+    ${r.rules.map(x => `<tr class="${x.active ? '' : 'dim'}"><td class="b">${x.field}</td><td>${x.input}</td><td>${x.cmp}</td><td class="tnum">${x.tol}</td><td>${x.mand ? chip('Sí', 'brand') : chip('No', 'grey')}</td><td>${sevChip(x.sev)}</td><td class="tnum b">${x.weight}%</td><td>${x.active ? chip('Activa', 'green') : chip('Desactivada', 'grey')}</td><td class="acts">${editable ? (x.active ? `<button class="btn pill neutral" type="button" data-red="${x.id}">Editar</button><button class="btn pill" type="button" data-rdis="${x.id}">Desactivar</button>` : `<button class="btn pill ok" type="button" data-ract="${x.id}">Reactivar</button>`) : ''}</td></tr>`).join('')}
+  </tbody></table></div>
+  <div class="mt">${editable ? banner('info', `Cada alta, edición o desactivación genera la versión <b>v${r.version + 1}</b> con usuario, fecha y detalle del cambio; las versiones anteriores se conservan. ${pin('04')} Un cambio con impacto operativo (obligatoriedad, severidad crítica o peso) exige confirmación y notifica a los validadores de ${r.procs.map(procName).join(' y ')}. ${pin('06')}`) : banner('grey', `Tu rol <b>${S.roles[viewer().role].name}</b> solo puede consultar. ${pin('03')}`, 'lock')}</div>`;
+  $('#rsBack').onclick = () => { ui.ruleSet = null; render(); };
+  $('#rsVers').onclick = () => openDrawer({ title: `Versiones · ${r.id}`, sub: 'Cada versión conserva usuario, fecha, detalle del cambio y periodo desde el que aplicó', body: `<div class="vlist">${r.versions.map((v, i) => `<div class="vitem ${i === 0 ? 'cur' : ''}"><span class="vn">v${v.v}</span><div><div>${esc(v.detail)}</div><div class="vd">${v.ts} · ${v.user} · aplicó desde ${v.from}${i === 0 ? ' · <b>vigente</b>' : ''}</div></div><span class="spacer"></span><button class="btn xs ghost" type="button" data-vv="${v.v}">Ver</button></div>`).join('')}</div>` }) || setTimeout(() => $$('[data-vv]').forEach(b => b.onclick = () => toast(`Vista de solo lectura de ${r.id} v${b.dataset.vv} (simulación).`)), 0);
+  if ($('#rsExp')) $('#rsExp').onclick = () => toast(`${ICON.export} <span>Exportado <b>${r.id}_v${r.version}.xlsx</b> (simulación)</span>`);
+  const ruleDrawer = (x) => { const isNew = !x; x = x || { field: FIELDS[0], input: INPUT_FIELDS[0], cmp: COMPARE[0], tol: '0', mand: true, sev: 'Mayor', weight: 5 };
+    openDrawer({ title: isNew ? 'Nueva regla' : `Editar regla · ${x.field}`, sub: `${r.id} · generará la versión v${r.version + 1}`, body: `<div class="fgrid">
+      <div class="field"><label>Campo del diseño</label><select class="sel" id="rField">${FIELDS.map(f => `<option ${f === x.field ? 'selected' : ''}>${f}</option>`).join('')}</select></div>
+      <div class="field"><label>Campo del insumo con el que se compara</label><select class="sel" id="rInput">${INPUT_FIELDS.map(f => `<option ${f === x.input ? 'selected' : ''}>${f}</option>`).join('')}</select></div>
+      <div class="field"><label>Tipo de comparación</label><select class="sel" id="rCmp">${COMPARE.map(f => `<option ${f === x.cmp ? 'selected' : ''}>${f}</option>`).join('')}</select></div>
+      <div class="field"><label>Tolerancia admitida</label><input class="inp" id="rTol" value="${esc(x.tol)}" placeholder="Ej.: ≥ 95% · ± $0.50 · 0 días"></div>
+      <div class="field"><label>Severidad del incumplimiento</label><select class="sel" id="rSev">${S.sevs.map(s => `<option ${s.name === x.sev ? 'selected' : ''}>${s.name}</option>`).join('')}</select><div class="hint">Del catálogo de Tipología de errores.</div></div>
+      <div class="field"><label>Peso en el cálculo de coincidencia</label><div class="row"><input class="inp" id="rW" type="number" min="0" max="100" value="${x.weight}" style="width:120px"><span class="muted small">% · suma actual ${sum}%</span></div></div>
+      <div class="field full"><label>Obligatoriedad</label><span class="tg ${x.mand ? 'on' : ''}" id="rMand" role="switch" tabindex="0"><i></i><span>${x.mand ? 'Obligatoria · su incumplimiento no puede ignorarse' : 'Opcional'}</span></span></div>
+      <div class="field full"><label>Detalle del cambio (queda en la versión) ${pin('04')}</label><textarea class="ta" id="rDet" placeholder="Qué cambia y por qué"></textarea></div></div>`,
+      footer: `<button class="btn ghost" type="button" id="rCancel">Cancelar</button><button class="btn primary" type="button" id="rSave">${isNew ? 'Crear regla' : 'Guardar'}</button>` });
+    $('#rMand').onclick = () => { $('#rMand').classList.toggle('on'); $('#rMand span').textContent = $('#rMand').classList.contains('on') ? 'Obligatoria · su incumplimiento no puede ignorarse' : 'Opcional'; }; $('#rCancel').onclick = closeDrawer;
+    $('#rSave').onclick = () => { const det = $('#rDet').value.trim(); if (!det) return toast('Indica el detalle del cambio.', 'err');
+      const nv = { field: $('#rField').value, input: $('#rInput').value, cmp: $('#rCmp').value, tol: $('#rTol').value, mand: $('#rMand').classList.contains('on'), sev: $('#rSev').value, weight: +$('#rW').value, active: true };
+      const impact = isNew ? (nv.mand || nv.sev === 'Crítica' || nv.weight > 0) : (nv.mand !== x.mand || nv.sev !== x.sev || nv.weight !== x.weight || (nv.sev === 'Crítica'));
+      const apply = () => { if (isNew) r.rules.push({ id: Date.now(), ...nv }); else Object.assign(x, nv); r.version += 1; r.versions.unshift({ v: r.version, ts: nowStr(), user: viewerName(), detail: det, from: 'P12 · 2026' }); logEvent('Reglas de validación', `Nueva versión v${r.version}`, `${r.id} · ${nv.field}`, isNew ? '—' : `${x.cmp} ${x.tol} · ${x.sev} · ${x.weight}%`, `${nv.cmp} ${nv.tol} · ${nv.sev} · ${nv.weight}%`, det); closeDrawer(); toast(`${r.id} v${r.version} publicada${impact ? ' · validadores notificados' : ''}.`); render(); };
+      if (impact) openModal({ title: 'Cambio con impacto operativo', confirm: 'Confirmar y notificar', body: banner('amber', `Este cambio toca <b>obligatoriedad, severidad crítica o peso</b>. Al confirmar se crea la versión <b>v${r.version + 1}</b> y se notifica automáticamente a los validadores de <b>${r.procs.map(procName).join(' y ')}</b>. ${pin('06')}`, 'warn') + `<dl class="kv mt"><dt>Regla</dt><dd>${esc(nv.field)}</dd><dt>Obligatoria</dt><dd>${nv.mand ? 'Sí' : 'No'}</dd><dt>Severidad</dt><dd>${nv.sev}</dd><dt>Peso</dt><dd>${nv.weight}%</dd><dt>Detalle</dt><dd>${esc(det)}</dd></dl>`, onConfirm: apply }); else apply(); };
+  };
+  if ($('#ruleNew')) $('#ruleNew').onclick = () => ruleDrawer(null);
+  $$('[data-red]').forEach(b => b.onclick = () => ruleDrawer(r.rules.find(x => x.id === +b.dataset.red)));
+  $$('[data-rdis]').forEach(b => b.onclick = () => { const x = r.rules.find(y => y.id === +b.dataset.rdis);
+    const others = r.rules.filter(y => y.active && y.mand && y.field === x.field && y !== x);
+    const procMand = x.mand && ['Precio promocional', 'SKU / código de barras', 'Vigencia', 'Descripción de mecánica'].includes(x.field);
+    if (procMand && !others.length) return openModal({ title: 'No se puede desactivar', hideConfirm: true, cancel: 'Entendido', body: banner('red', `<b>${x.field}</b> es un campo declarado obligatorio por el proceso ${r.procs.map(procName).join(' / ')} y esta es su última regla obligatoria activa. Para desactivarla primero agrega otra regla obligatoria para el campo o cambia la matriz del proceso. ${pin('08')}`, 'warn') });
+    openModal({ title: `Desactivar regla · ${x.field}`, danger: true, confirm: 'Desactivar', body: `<p>La regla deja de aplicarse a partir de la versión <b>v${r.version + 1}</b>; las validaciones anteriores conservan la versión con la que corrieron. ${pin('05')}</p><div class="field"><label>Detalle del cambio</label><textarea class="ta" id="rdDet"></textarea></div>`, onConfirm: () => { const det = $('#rdDet').value.trim(); if (!det) { toast('Indica el detalle.', 'err'); return false; } x.active = false; r.version += 1; r.versions.unshift({ v: r.version, ts: nowStr(), user: viewerName(), detail: `Desactiva «${x.field}»: ${det}`, from: 'P12 · 2026' }); logEvent('Reglas de validación', `Nueva versión v${r.version}`, `${r.id} · ${x.field}`, 'Activa', 'Desactivada', det); toast(`Regla desactivada · ${r.id} v${r.version}.`); render(); } }); });
+  $$('[data-ract]').forEach(b => b.onclick = () => { const x = r.rules.find(y => y.id === +b.dataset.ract); x.active = true; r.version += 1; r.versions.unshift({ v: r.version, ts: nowStr(), user: viewerName(), detail: `Reactiva «${x.field}»`, from: 'P12 · 2026' }); logEvent('Reglas de validación', `Nueva versión v${r.version}`, `${r.id} · ${x.field}`, 'Desactivada', 'Activa', 'Reactivación'); toast(`Regla reactivada · v${r.version}.`); render(); });
+}
+
+/* ===================== 5. Tipología de errores (VD-1.5) ===================== */
+function renderErr(m) {
+  if (!can('vd.err.view')) return noAccess(m, 'Tipología de errores');
+  const editable = can('vd.err.edit'); const ver = S.errVersions[0].v;
+  const effect = sev => { const s = S.sevs.find(x => x.name === sev); return s ? s.effect.split(';')[0].split('.')[0] : '—'; };
+  const catChip = c => chip(c, 'outline');
+  let body = '';
+  if (ui.errTab === 'cat') {
+    const rows = S.errors.filter(e => (!ui.errFilters.cat || e.cat === ui.errFilters.cat) && (!ui.errFilters.sev || e.sev === ui.errFilters.sev));
+    body = `<div class="toolbar"><div class="search">${ICON.search}<input placeholder="Buscar por código o nombre…" aria-label="Buscar error" id="errSearch"></div><span class="count">${rows.length} tipos</span><span class="spacer"></span>
+      <select class="sel" style="width:auto" id="fCat"><option value="">Todas las categorías</option>${['Insumo', 'Diseño', 'Imagen', 'Integración', 'Sistema'].map(c => `<option ${ui.errFilters.cat === c ? 'selected' : ''}>${c}</option>`).join('')}</select>
+      <select class="sel" style="width:auto" id="fSev"><option value="">Todas las severidades</option>${S.sevs.map(s => `<option ${ui.errFilters.sev === s.name ? 'selected' : ''}>${s.name}</option>`).join('')}</select></div>
+    <div class="tblwrap"><table class="tbl"><thead><tr><th>Código ${pin('01')}</th><th>Nombre</th><th>Categoría</th><th>Severidad</th><th>Efecto en el flujo</th><th>Rol responsable</th><th>Recomendación</th><th>Estatus</th><th></th></tr></thead><tbody>
+      ${rows.map(e => `<tr class="${e.active ? '' : 'dim'}"><td class="b tnum">${e.code}</td><td>${esc(e.name)}</td><td>${catChip(e.cat)}</td><td>${sevChip(e.sev)}</td><td>${e.block ? chip('Detiene el flujo', 'red') : e.sev === 'Mayor' ? chip('Revisión manual', 'amber') : chip('Descuenta del %', 'info')}</td><td>${e.role}</td><td class="muted small" style="max-width:280px">${esc(e.rec)}</td><td>${e.active ? chip('Activo', 'green') : chip('Inactivo', 'grey')}</td><td class="acts">${editable ? `<button class="btn pill neutral" type="button" data-eed="${e.code}">Editar</button>` : ''}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="grid g-2 mt">
+      ${banner('info', `<b>Cómo se aplica la severidad:</b> Crítica detiene el flujo del diseño o del lote y exige resolución explícita ${pin('03')}; Mayor impide la aprobación automática y envía a revisión manual; Menor se registra y descuenta del porcentaje sin bloquear ${pin('04')}. La severidad se decide aquí y el motor, la bandeja, las notificaciones y los reportes la aplican.`)}
+      <div class="card"><div class="card-h" style="font-size:14px">Así se referencia en pantalla, correo y reporte ${pin('05')}</div><div class="card-b stack" style="gap:10px"><div class="row">${chip('ERR-DIS-001', 'red')}<span>Precio no coincide con Lista de Producción · <span class="muted">Folio F-1112-0453 · Imprenta Milenio</span></span></div><div class="row">${chip('ERR-IMG-002', 'red')}<span>Sin imagen vigente en el banco · <span class="muted">dictamen «Bloqueado por insumo»</span></span></div><div class="row">${chip('ERR-DIS-006', 'info')}<span>Logo o marca ausente · <span class="muted">−3% en coincidencia</span></span></div></div></div>
+    </div>`;
+  } else if (ui.errTab === 'sev') {
+    body = `<div class="tblwrap"><table class="tbl"><thead><tr><th>Orden</th><th>Nivel ${pin('02')}</th><th>Efecto sobre el flujo</th><th>Tipos de error</th><th></th></tr></thead><tbody>
+      ${S.sevs.sort((a, b) => a.order - b.order).map(s => `<tr><td class="tnum">${s.order}</td><td>${sevChip(s.name)}</td><td>${esc(s.effect)}</td><td class="tnum">${S.errors.filter(e => e.sev === s.name).length}</td><td class="acts">${editable && s.editable ? `<button class="btn pill" type="button" data-sdel="${s.name}">Quitar</button>` : ''}</td></tr>`).join('')}
+    </tbody></table></div>
+    <div class="row mt"><span class="muted small">Los tres niveles base (crítica, mayor, menor) son los que exige el cliente; el catálogo admite agregar niveles sin cambio de código. ${pin('02')}</span><span class="spacer"></span>${editable ? `<button class="btn primary sm" type="button" id="sevAdd">${ICON.plus} Agregar nivel</button>` : ''}</div>`;
+  } else {
+    body = `<div class="vlist">${S.errVersions.map((v, i) => `<div class="vitem ${i === 0 ? 'cur' : ''}"><span class="vn">v${v.v}</span><div><div>${esc(v.detail)}</div><div class="vd">${v.ts} · ${v.user}${i === 0 ? ' · <b>vigente</b>' : ''}</div></div></div>`).join('')}</div><div class="mt small muted">El catálogo es versionado y auditable igual que las reglas de validación: cada validación guarda la versión del catálogo con la que se ejecutó. ${pin('06')}</div>`;
+  }
+  m.innerHTML = crumb('Tipología de errores') + `
+  <div class="pagehead"><div><h1>Tipología de errores</h1><div class="sub">Catálogo único de tipos de error con su severidad, su efecto sobre el flujo, el rol responsable de resolverlo y la recomendación que verá el usuario. Todo el módulo referencia estos códigos.</div></div>
+    <div class="actions"><span class="chip brand">Catálogo v${ver}</span>${editable && ui.errTab === 'cat' ? `<button class="btn primary" type="button" id="errNew">${ICON.plus} Nuevo tipo de error</button>` : ''}</div></div>
+  <div class="tabs">${[['cat', `Catálogo de errores (${S.errors.length})`], ['sev', `Severidades (${S.sevs.length})`], ['ver', `Versiones (${S.errVersions.length})`]].map(([k, t]) => `<button class="tab ${ui.errTab === k ? 'on' : ''}" type="button" data-etab="${k}">${t}</button>`).join('')}</div>${body}`;
+  $$('[data-etab]').forEach(b => b.onclick = () => { ui.errTab = b.dataset.etab; render(); });
+  if ($('#fCat')) { $('#fCat').onchange = () => { ui.errFilters.cat = $('#fCat').value; render(); }; $('#fSev').onchange = () => { ui.errFilters.sev = $('#fSev').value; render(); }; $('#errSearch').oninput = e => { const q = e.target.value.toLowerCase(); $$('.tbl tbody tr').forEach(tr => tr.style.display = tr.textContent.toLowerCase().includes(q) ? '' : 'none'); }; }
+  const errDrawer = (e) => { const isNew = !e; e = e || { code: '', name: '', cat: 'Diseño', sev: 'Mayor', block: false, role: 'Imprenta', rec: '', active: true };
+    openDrawer({ title: isNew ? 'Nuevo tipo de error' : `Editar · ${e.code}`, sub: `Generará el catálogo v${ver + 1}`, body: `<div class="fgrid">
+      <div class="field"><label>Código</label><input class="inp" id="eCode" value="${esc(e.code)}" placeholder="ERR-DIS-008" ${isNew ? '' : 'readonly'}><div class="hint">ERR-{INS|DIS|IMG|INT|SIS}-nnn</div></div>
+      <div class="field"><label>Categoría</label><select class="sel" id="eCat">${['Insumo', 'Diseño', 'Imagen', 'Integración', 'Sistema'].map(c => `<option ${c === e.cat ? 'selected' : ''}>${c}</option>`).join('')}</select></div>
+      <div class="field full"><label>Nombre</label><input class="inp" id="eName" value="${esc(e.name)}"></div>
+      <div class="field"><label>Severidad</label><select class="sel" id="eSev">${S.sevs.map(s => `<option ${s.name === e.sev ? 'selected' : ''}>${s.name}</option>`).join('')}</select><div class="hint" id="eEff"></div></div>
+      <div class="field"><label>Rol responsable de resolverlo</label><select class="sel" id="eRole">${['Imprenta', 'Coordinador de Diseños', 'Operación Promociones', 'Administrador', 'Soporte técnico'].map(x => `<option ${x === e.role ? 'selected' : ''}>${x}</option>`).join('')}</select></div>
+      <div class="field full"><label>¿Bloquea el flujo?</label><span class="tg ${e.block ? 'on' : ''}" id="eBlock" role="switch" tabindex="0"><i></i><span>${e.block ? 'Sí · detiene el diseño o lote afectado' : 'No · continúa con registro'}</span></span></div>
+      <div class="field full"><label>Texto de recomendación (lo ve el responsable)</label><textarea class="ta" id="eRec">${esc(e.rec)}</textarea></div>
+      <div class="field full"><label>Estatus</label><select class="sel" id="eAct"><option value="1" ${e.active ? 'selected' : ''}>Activo</option><option value="0" ${!e.active ? 'selected' : ''}>Inactivo</option></select></div></div>`,
+      footer: `<button class="btn ghost" type="button" id="eCancel">Cancelar</button><button class="btn primary" type="button" id="eSave">${isNew ? 'Crear' : 'Guardar'}</button>` });
+    const eff = () => { const s = S.sevs.find(x => x.name === $('#eSev').value); $('#eEff').textContent = s ? s.effect : ''; if (s && s.name === 'Crítica' && !$('#eBlock').classList.contains('on')) { $('#eBlock').classList.add('on'); $('#eBlock span').textContent = 'Sí · detiene el diseño o lote afectado'; } }; eff(); $('#eSev').onchange = eff;
+    $('#eBlock').onclick = () => { $('#eBlock').classList.toggle('on'); $('#eBlock span').textContent = $('#eBlock').classList.contains('on') ? 'Sí · detiene el diseño o lote afectado' : 'No · continúa con registro'; }; $('#eCancel').onclick = closeDrawer;
+    $('#eSave').onclick = () => { const nv = { code: $('#eCode').value.trim().toUpperCase(), name: $('#eName').value.trim(), cat: $('#eCat').value, sev: $('#eSev').value, block: $('#eBlock').classList.contains('on'), role: $('#eRole').value, rec: $('#eRec').value, active: $('#eAct').value === '1' }; if (!nv.code || !nv.name) return toast('Código y nombre son obligatorios.', 'err'); if (isNew && S.errors.some(x => x.code === nv.code)) return toast('El código ya existe.', 'err');
+      openModal({ title: `Publicar catálogo v${ver + 1}`, body: `<p>${isNew ? 'Alta' : 'Edición'} de <b>${nv.code} · ${esc(nv.name)}</b> (${nv.sev}${nv.block ? ', bloquea' : ''}). El motor, las notificaciones, la bandeja y los reportes usarán este catálogo a partir del siguiente ciclo.</p>`, onConfirm: () => { if (isNew) S.errors.push(nv); else Object.assign(e, nv); S.errVersions.unshift({ v: ver + 1, ts: nowStr(), user: viewerName(), detail: `${isNew ? 'Alta' : 'Edición'} ${nv.code} «${nv.name}» · ${nv.sev}${nv.block ? ' · bloquea' : ''}` }); logEvent('Tipología de errores', isNew ? 'Alta de tipo de error' : 'Edición de tipo de error', nv.code, isNew ? '—' : `${e.sev}`, `${nv.sev}${nv.block ? ' · bloquea' : ''}`, `Catálogo v${ver + 1}`); closeDrawer(); toast(`Catálogo v${ver + 1} publicado.`); render(); } }); };
+  };
+  if ($('#errNew')) $('#errNew').onclick = () => errDrawer(null);
+  $$('[data-eed]').forEach(b => b.onclick = () => errDrawer(S.errors.find(e => e.code === b.dataset.eed)));
+  if ($('#sevAdd')) $('#sevAdd').onclick = () => openDrawer({ title: 'Agregar nivel de severidad', body: `<div class="field"><label>Nombre del nivel</label><input class="inp" id="sName" placeholder="Ej.: Informativa"></div><div class="field"><label>Efecto sobre el flujo</label><textarea class="ta" id="sEff" placeholder="Ej.: Solo se registra en el reporte; no descuenta ni bloquea."></textarea></div><div class="field"><label>Orden</label><input class="inp" id="sOrd" type="number" value="${S.sevs.length + 1}"></div>`, footer: `<button class="btn ghost" type="button" id="sCancel">Cancelar</button><button class="btn primary" type="button" id="sSave">Agregar</button>` }) || setTimeout(() => { $('#sCancel').onclick = closeDrawer; $('#sSave').onclick = () => { const n = $('#sName').value.trim(); if (!n) return toast('Indica el nombre.', 'err'); S.sevs.push({ name: n, effect: $('#sEff').value, cls: 'grey', order: +$('#sOrd').value, editable: true }); S.errVersions.unshift({ v: ver + 1, ts: nowStr(), user: viewerName(), detail: `Alta de nivel de severidad «${n}»` }); logEvent('Tipología de errores', 'Alta de nivel de severidad', n, '—', 'Creado', `Catálogo v${ver + 1}`); closeDrawer(); toast(`Nivel «${n}» agregado sin cambio de código.`); render(); }; }, 0);
+  $$('[data-sdel]').forEach(b => b.onclick = () => { const n = b.dataset.sdel; if (S.errors.some(e => e.sev === n)) return toast('Hay tipos de error con este nivel; reasígnalos antes de quitarlo.', 'err'); S.sevs = S.sevs.filter(s => s.name !== n); logEvent('Tipología de errores', 'Baja de nivel de severidad', n, 'Activo', 'Eliminado', ''); toast(`Nivel «${n}» eliminado.`); render(); });
+}
+
+/* ===================== 6. Roles y usuarios (VD-1.6) ===================== */
+function renderRoles(m) {
+  if (!can('ap.roles.1')) return noAccess(m, 'Roles y usuarios');
+  const role = S.roles[ui.roleSel]; const editable = can('ap.roles.2');
+  const work = ui.roleDirty && ui.roleDirty.role === ui.roleSel ? ui.roleDirty.perms : { ...role.perms };
+  const total = PERMS.groups.reduce((a, g) => a + g.items.length, 0); const sel = Object.values(work).filter(Boolean).length;
+  const tabs = [['perms', 'Permisos por rol'], ['users', 'Resumen de accesos'], ['log', 'Bitácora de permisos']];
+  let body = '';
+  if (ui.roleTab === 'perms') {
+    const groups = PERMS.groups.map(g => { const on = g.items.filter(i => work[i.id]).length; const state = on === 0 ? false : on === g.items.length ? true : 'ind'; const isOpen = ui.accOpen[g.id];
+      let items = ''; let lastG = null;
+      for (const it of g.items) { if (it.g && it.g !== lastG) { items += `<div class="grp">${it.g}</div>`; lastG = it.g; } items += cbHtml(!!work[it.id], it.t, { dis: !editable, attrs: `data-perm="${it.id}"` }); }
+      return `<div class="acc ${isOpen ? 'open' : ''} ${g.existing ? '' : 'newgrp'}"><div class="acc-h" data-acc="${g.id}"><span class="chev">${ICON.chev}</span>${cbHtml(state, '', { dis: !editable, attrs: `data-gperm="${g.id}"` })}<span class="ttl">${g.name}</span><span class="cnt">${on} de ${g.items.length}</span></div><div class="acc-b">${items}</div></div>`; }).join('');
+    body = `<div class="grid g-side">
+      <div class="card"><div class="card-h">Lista de Roles</div><div class="rolelist">
+        ${['super', 'cat', 'oper', 'reg'].map(k => `<button class="roleitem ${ui.roleSel === k ? 'on' : ''}" type="button" data-role="${k}">${S.roles[k].name}</button>`).join('')}
+        <div class="rolesec">Validación de Diseños ${pin('01')}</div>
+        ${['admin', 'coord', 'valid', 'imp', 'consulta'].map(k => `<button class="roleitem ${ui.roleSel === k ? 'on' : ''}" type="button" data-role="${k}">${S.roles[k].name}<span class="nw">Nuevo</span></button>`).join('')}
+      </div></div>
+      <div class="card"><div class="card-h">Permisos · ${role.name} <span class="meta">${sel} de ${total} seleccionados</span></div>
+        ${role.scope ? `<div style="padding:16px 20px 0">${banner('amber', `<b>Alcance restringido:</b> ${role.scope} ${pin('03')}`, 'lock')}</div>` : ''}
+        ${!editable ? `<div style="padding:16px 20px 0">${banner('grey', `Solo el <b>Administrador</b> modifica roles y permisos; tu rol <b>${S.roles[viewer().role].name}</b> consulta. ${pin('04')}`, 'lock')}</div>` : ''}
+        <div>${groups}</div>
+      </div></div>
+      ${ui.roleDirty && ui.roleDirty.role === ui.roleSel ? `<div class="savebar"><span class="msg">Tienes cambios sin guardar en <b>${role.name}</b>.</span><button class="btn ghost" type="button" id="rDiscard">Descartar</button><button class="btn primary" type="button" id="rSaveP">Guardar cambios</button></div>` : ''}`;
+  } else if (ui.roleTab === 'users') {
+    body = `<div class="card"><div class="card-h">Resumen de accesos y cambios de permisos por usuario ${pin('06')} <span class="meta">revisión administrativa periódica</span><button class="btn light sm" type="button" id="uExp">${ICON.export} Exportar</button></div>
+      <div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>Usuario</th><th>ID</th><th>Rol</th><th>Alcance (imprenta)</th><th>Último acceso</th><th>Último cambio de permisos</th><th>Realizado por</th><th>Intentos bloqueados</th></tr></thead><tbody>
+        ${S.users.map(u => { const bl = S.log.filter(l => l.type === 'bloqueado' && l.user === u.name).length; return `<tr><td class="b">${u.name}</td><td class="tnum">${u.id}</td><td>${chip(S.roles[u.role].name, S.roles[u.role].isNew ? 'brand' : 'outline')}</td><td>${u.imp}</td><td class="tnum">${u.last}</td><td class="tnum">${u.chg}</td><td>${u.by}</td><td>${bl ? chip(bl + ' registrados', 'amber') : '<span class="muted">—</span>'}</td></tr>`; }).join('')}
+      </tbody></table></div></div>`;
+  } else {
+    const rows = S.log.filter(l => l.mod === 'Roles y usuarios' || l.type === 'bloqueado');
+    body = `<div class="card"><div class="card-h">Bitácora de roles, permisos e intentos no autorizados ${pin('04')} ${pin('05')} <span class="meta">${rows.length} registros</span></div>
+      <div class="tblwrap" style="border:0"><table class="tbl"><thead><tr><th>Fecha</th><th>Usuario</th><th>Acción</th><th>Objeto</th><th>Anterior</th><th>Nuevo</th><th>Motivo / detalle</th><th>Tipo</th></tr></thead><tbody>
+        ${rows.map(l => `<tr><td class="tnum">${l.ts}</td><td>${l.user}</td><td>${esc(l.action)}</td><td>${esc(l.obj)}</td><td>${esc(l.before)}</td><td>${esc(l.after)}</td><td class="muted">${esc(l.motivo)}</td><td>${l.type === 'bloqueado' ? chip('Bloqueado', 'red') : chip('Cambio', 'green')}</td></tr>`).join('') || '<tr><td colspan="8" class="empty">Sin registros.</td></tr>'}
+      </tbody></table></div></div>`;
+  }
+  m.innerHTML = crumb1('Roles y usuarios') + `
+  <div class="pagehead"><div><h1>Roles y usuarios</h1><div class="sub">Registro detallado de las modificaciones a los permisos de los roles en la plataforma, desde su creación hasta su implementación en producción. Incluye los perfiles y acciones del módulo Validación de Diseños.</div></div></div>
+  <div class="tabs">${tabs.map(([k, t]) => `<button class="tab ${ui.roleTab === k ? 'on' : ''}" type="button" data-rtab="${k}">${t}</button>`).join('')}</div>${body}
+  <div class="mt small muted">Permisos por acción del módulo: cargar insumo, cargar diseño, ejecutar validación, aprobar, rechazar, configurar reglas, configurar umbral, consultar reportes y consultar bitácora. ${pin('02')}</div>`;
+  $$('[data-rtab]').forEach(b => b.onclick = () => { ui.roleTab = b.dataset.rtab; render(); });
+  $$('[data-role]').forEach(b => b.onclick = () => { const go2 = () => { ui.roleDirty = null; ui.roleSel = b.dataset.role; render(); }; if (ui.roleDirty && ui.roleDirty.role !== b.dataset.role) return openModal({ title: 'Cambios sin guardar', confirm: 'Descartar y cambiar', body: `<p>Tienes cambios sin guardar en <b>${role.name}</b>. Si cambias de rol se descartan.</p>`, onConfirm: go2 }); go2(); });
+  $$('[data-acc]').forEach(h => h.onclick = e => { if (e.target.closest('[data-gperm]')) return; ui.accOpen[h.dataset.acc] = !ui.accOpen[h.dataset.acc]; render(); });
+  const dirty = () => { if (!ui.roleDirty || ui.roleDirty.role !== ui.roleSel) ui.roleDirty = { role: ui.roleSel, perms: { ...role.perms } }; return ui.roleDirty.perms; };
+  if (editable) {
+    $$('[data-perm]').forEach(c => c.onclick = () => { const p = dirty(); p[c.dataset.perm] = !p[c.dataset.perm]; render(); });
+    $$('[data-gperm]').forEach(c => c.onclick = e => { e.stopPropagation(); const g = PERMS.groups.find(x => x.id === c.dataset.gperm); const p = dirty(); const allOn = g.items.every(i => p[i.id]); g.items.forEach(i => p[i.id] = !allOn); render(); });
+  } else { $$('[data-perm],[data-gperm]').forEach(c => c.onclick = e => { e.stopPropagation(); blocked('Editar permisos por rol', role.name, 'Roles y usuarios'); }); }
+  if ($('#rDiscard')) $('#rDiscard').onclick = () => { ui.roleDirty = null; render(); };
+  if ($('#rSaveP')) $('#rSaveP').onclick = () => { const p = ui.roleDirty.perms; const diffs = PERMS.groups.flatMap(g => g.items).filter(i => !!p[i.id] !== !!role.perms[i.id]); openModal({ title: `Guardar permisos · ${role.name}`, body: `<p>${diffs.length} permiso(s) cambian. El cambio aplica de inmediato a todos los usuarios con este rol y queda en la bitácora de auditoría. ${pin('04')}</p><ul>${diffs.map(i => `<li>${p[i.id] ? '<b>Otorga</b>' : '<b>Retira</b>'}: ${i.t}</li>`).join('')}</ul>`, confirm: 'Guardar', onConfirm: () => { diffs.forEach(i => logEvent('Roles y usuarios', p[i.id] ? 'Permiso otorgado' : 'Permiso retirado', `${role.name} · ${i.t}`, p[i.id] ? 'No' : 'Sí', p[i.id] ? 'Sí' : 'No', 'Edición de permisos por rol')); role.perms = { ...p }; ui.roleDirty = null; toast('Permisos guardados. Aplican de inmediato.'); render(); } }); };
+  if ($('#uExp')) $('#uExp').onclick = () => toast(`${ICON.export} <span>Resumen de accesos exportado (simulación).</span>`);
+}
+
+/* ===================== bitácora global ===================== */
+function openLog() {
+  const mods = [...new Set(S.log.map(l => l.mod))];
+  const rows = f => S.log.filter(l => !f || l.mod === f).map(l => `<tr><td class="tnum">${l.ts}</td><td>${l.user}</td><td>${l.mod}</td><td>${esc(l.action)}</td><td>${esc(l.obj)}</td><td class="tnum">${esc(l.before)}</td><td class="tnum b">${esc(l.after)}</td><td class="muted">${esc(l.motivo)}</td><td>${l.type === 'bloqueado' ? chip('Bloqueado', 'red') : chip('Cambio', 'green')}</td></tr>`).join('');
+  openDrawer({ title: 'Bitácora del módulo · Administración', sub: 'Usuario · fecha · valor anterior · valor nuevo · motivo. Consultable y exportable por periodo y por rol.', wide: true, body: `<div class="row"><select class="sel" id="logMod" style="width:auto"><option value="">Todos los submódulos</option>${mods.map(x => `<option>${x}</option>`).join('')}</select><span class="spacer"></span><button class="btn light sm" type="button" id="logExp">${ICON.export} Exportar</button></div><div class="tblwrap"><table class="tbl" style="font-size:13px"><thead><tr><th>Fecha</th><th>Usuario</th><th>Submódulo</th><th>Acción</th><th>Objeto</th><th>Anterior</th><th>Nuevo</th><th>Motivo</th><th>Tipo</th></tr></thead><tbody id="logBody">${rows('')}</tbody></table></div>` });
+  $('#logMod').onchange = () => $('#logBody').innerHTML = rows($('#logMod').value);
+  $('#logExp').onclick = () => toast(`${ICON.export} <span>Bitácora exportada (simulación).</span>`);
+}
+
+/* ===================== panel de referencia HU ===================== */
+const HU = {
+  cal: { id: 'VD-1.1', title: 'Configuración de periodos y ventanas de validación', story: 'Como Administrador del módulo requiero definir y modificar los periodos promocionales activos del año y las fechas objetivo (N) en las que debe ejecutarse cada validación, para que ninguna validación se ejecute fuera de la ventana autorizada.',
+    acs: ['Lista por año y periodo: periodo, año, proceso, N apertura, N cierre, fecha inicio, fecha fin y estatus.', 'Número de periodos del año parametrizable; por defecto 13.', 'N de apertura y cierre configurables por proceso.', 'Fecha derivada = inicio del periodo + N; se recalcula si cambia la N o el inicio.', 'Editar exige confirmación en modal y afecta tareas y notificaciones del periodo.', 'Bloquea la ejecución fuera de ventana e indica periodo, proceso y ventana vigente.', 'Todo cambio queda registrado (usuario, fecha, anterior, nuevo, motivo); consultable y exportable.', 'Los periodos cerrados se consultan pero no se editan.'],
+    decision: 'Patrón de Aprix reutilizado: <b>Apertura y cierre de períodos</b> (PIEP) — KPIs de periodo, tabla por función/proceso con N, acciones Cerrar/Reabrir y drawer de filtros. Las fechas base se toman del Calendario Promocional que Aprix ya administra (a confirmar con el TL).',
+    q: ['¿El módulo consume el calendario promocional de Aprix (recomendado) o mantiene uno propio?', '¿Quién cierra manualmente una ventana en la operación real: Administrador o también Coordinador?', '¿Se necesita reabrir una ventana de un periodo ya iniciado en tienda (hoy bloqueado por AC-08)?'] },
+  proc: { id: 'VD-1.2', title: 'Catálogo de procesos promocionales y matriz de insumos', story: 'Como Coordinador de Diseños requiero mantener el catálogo de procesos y declarar, para cada uno, qué insumos son obligatorios y qué pasos del flujo aplican, para que el motor aplique el tratamiento correcto sin indicarlo manualmente.',
+    acs: ['Catálogo con Cerveza, Local, Nacional, Cortas Vigencias y Reacción; admite altas.', 'Por proceso: insumos obligatorios, flujo de impresión, conjunto de reglas y umbral aplicable.', 'Reacción sin Lista de Producción ni flujo de impresión.', 'Sin insumos completos el ciclo no inicia y se indica cuál falta.', 'Desactivar por periodo sin borrar ni perder histórico.', 'Resultados, incidencias y reportes clasificados y filtrables por proceso.'],
+    decision: '<b>Submódulo separado del calendario, pero enlazado.</b> El calendario es operativo (cambia cada periodo, acciones abrir/cerrar, permisos de Administrador); el catálogo es dato maestro (cambia rara vez, lo mantiene el Coordinador, define insumos, reglas, umbral y pasos). El enlace: la ventana por defecto (N) de cada proceso siembra las filas del calendario, y cada fila del calendario referencia su proceso. Patrón de Aprix reutilizado: lista + detalle (como Roles y usuarios) y matriz consolidada (como Catálogos Maestros).',
+    q: ['¿Se acepta separar Calendario (operación) y Procesos e insumos (maestro) o se prefiere un único submódulo con dos pestañas?', '¿Los insumos tienen origen configurable por proceso (Aprix / Data Lake / Excel)? Definición abierta n.º 1.', '¿Qué pasos del flujo son realmente opcionales por proceso además de la impresión?'] },
+  umbral: { id: 'VD-1.3', title: 'Configuración del umbral de coincidencia', story: 'Como Administrador requiero visualizar y ajustar el porcentaje mínimo de coincidencia para aprobar automáticamente un diseño, con control de permisos y auditoría.',
+    acs: ['Valor por defecto 98%; solo el Administrador lo modifica.', 'Global y, opcionalmente, por proceso y por campo validado.', 'Aplica al siguiente ciclo; nunca recalcula dictámenes emitidos.', 'Intento sin permiso: se bloquea y queda registrado.', 'Muestra valor vigente e historial (usuario, fecha, anterior, nuevo, periodo de aplicación).'],
+    decision: 'Usa <b>Ver como</b> en la barra superior para cambiar a Coordinador o Validador y pulsar «Modificar umbral»: el intento se bloquea, se registra y aparece en la bitácora (AC-04).',
+    q: ['¿El umbral se sobreescribe por campo o solo global y por proceso? Impacta el cálculo de VD-4.7.', '¿Rango permitido del umbral (p. ej. 90–100%)?'] },
+  reglas: { id: 'VD-1.4', title: 'ABC y versionado de reglas de validación', story: 'Como Coordinador de Diseños requiero agregar, editar y desactivar las reglas con las que se valida cada campo, conservando la versión aplicada en cada periodo.',
+    acs: ['Cada regla: campo del diseño, campo del insumo, comparación, tolerancia, obligatoriedad, severidad y peso.', 'Conjuntos asociados a uno o varios procesos y a un rango de periodos.', 'Solo con permiso de edición se crea, modifica o desactiva.', 'Cada cambio genera nueva versión (usuario, fecha, detalle, número); las anteriores se conservan.', 'Cada validación guarda la versión con la que se ejecutó.', 'Cambio con impacto operativo exige confirmación y notifica a los validadores.', 'Conjunto vigente consultable y exportable.', 'No se desactiva la última regla obligatoria de un campo obligatorio.'],
+    decision: 'Dos niveles: lista de conjuntos (por proceso) y detalle del conjunto con sus reglas, KPI de suma de pesos (debe dar 100%) y drawer de versiones. La severidad se toma del catálogo de Tipología de errores.',
+    q: ['¿Universo exacto de campos por proceso y peso de cada uno?', '¿El 98% se mide sobre el diseño completo o también por campo?', '¿Quién recibe la notificación de cambio con impacto: validadores del proceso, Coordinador, imprentas?'] },
+  err: { id: 'VD-1.5', title: 'Catálogo de tipología y severidad de errores', story: 'Como Coordinador de Diseños requiero un catálogo único de tipos de error con severidad, efecto sobre el flujo y destinatario, para que motor, notificaciones, bandeja y reportes hablen del mismo error.',
+    acs: ['Cada error: código, nombre, categoría, severidad, si bloquea, rol responsable y recomendación.', 'Severidades crítica, mayor y menor; se pueden agregar niveles sin código.', 'Críticos detienen el flujo y exigen resolución explícita.', 'Mayores → revisión manual; menores → descuentan del % sin bloquear.', 'Todo error en pantalla, correo o reporte referencia su código.', 'Versionado y auditable igual que las reglas.'],
+    decision: 'Responde a la definición abierta n.º 4 del cliente. El catálogo se entrega con una propuesta inicial de 17 tipos para que OXXO lo complete; la estructura existe desde el inicio porque de ella dependen el motor, las notificaciones y los reportes.',
+    q: ['Catálogo inicial real y severidad de cada error (definición abierta n.º 4).', '¿Los errores de integración escalan a soporte de OXXO o de IceMobile?'] },
+  roles: { id: 'VD-1.6', title: 'Roles y permisos del módulo', story: 'Como Administrador requiero asignar y modificar los roles del módulo controlando quién carga insumos, quién carga diseños, quién aprueba, quién configura reglas y quién solo consulta, incluida la imprenta como tercero.',
+    acs: ['Perfiles mínimos: Administrador, Coordinador de Diseños, Validador de Operación Promociones, Imprenta y Consulta.', 'Permisos por acción: cargar insumo, cargar diseño, ejecutar, aprobar, rechazar, configurar reglas, configurar umbral, consultar reportes, consultar bitácora.', 'Imprenta: alcance restringido a sus propios diseños y folios.', 'Cambio de rol solo por Administrador y registrado.', 'Todo intento no autorizado se bloquea y documenta (usuario, fecha, acción, objeto).', 'Vista de resumen de accesos y cambios de permisos por usuario.'],
+    decision: 'Es la pantalla <b>existente</b> de Aprix (Roles y usuarios): se agregan los cinco roles del módulo y dos grupos de permisos (Administración y Operación de Validación de Diseños). En Opción B los usuarios de imprenta viven en el tenant externo (VP-3/VP-4). Los permisos que marques aquí son los que aplican al «Ver como» de la barra superior.',
+    q: ['¿Se crean roles nuevos o se extienden los existentes (Operación de promociones ↔ Validador)?', '¿Un usuario puede tener más de un rol?', '¿La revisión periódica de accesos tiene una frecuencia definida por OXXO?'] },
+};
+function renderHU() {
+  const h = HU[route]; const p = $('#hupanel'); if (!h) { p.innerHTML = ''; return; }
+  p.innerHTML = `<div class="eyebrow">${h.id} · Módulo 1 Administración</div><h3>${h.title}</h3><div class="story">${h.story}</div>
+    <h4>Criterios de aceptación</h4><ul class="acl">${h.acs.map((a, i) => `<li data-hl="${pad(i + 1)}"><span class="n">AC-${pad(i + 1)}</span><span>${a}</span></li>`).join('')}</ul>
+    <h4>Decisión de diseño</h4><div class="note d">${h.decision}</div>
+    <h4>Para refinar con el cliente</h4>${h.q.map(q => `<div class="note q">${q}</div>`).join('')}
+    <div class="legend">Los pines <span class="pin" style="margin:0 2px">0n</span> en la pantalla señalan dónde se cubre cada criterio. Clic en un criterio para resaltarlos. Fecha simulada: 22/09/2026.</div>`;
+  $$('[data-hl]', p).forEach(li => li.onclick = () => { const n = li.dataset.hl; $$('.pin').forEach(x => x.classList.toggle('hl', x.dataset.ac === n)); const first = $(`.main .pin[data-ac="${n}"]`); if (first) first.scrollIntoView({ behavior: 'smooth', block: 'center' }); else toast(`AC-${n}: se demuestra en otra acción de esta pantalla (modal, drawer o simulación).`, 'warn'); setTimeout(() => $$('.pin.hl').forEach(x => x.classList.remove('hl')), 2600); });
+}
+
+/* ===================== barra de demo ===================== */
+function initDemobar() {
+  const sel = $('#viewerSel'); sel.innerHTML = VIEWERS.map(v => `<option value="${v.id}" ${v.id === S.viewer ? 'selected' : ''}>${S.roles[v.role].name} — ${v.name}</option>`).join('');
+  sel.onchange = () => { S.viewer = sel.value; ui.roleDirty = null; render(); toast(`Ahora ves Aprix como <b>${S.roles[viewer().role].name}</b>.`, 'ok', 2500); };
+  const tg = $('#huToggle'); const setHU = on => { S.hu = on; tg.classList.toggle('on', on); tg.setAttribute('aria-checked', on); document.body.classList.toggle('hu-off', !on); try { localStorage.setItem('vd-hu', on ? '1' : '0'); } catch (e) { } };
+  tg.onclick = () => setHU(!S.hu); tg.onkeydown = e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setHU(!S.hu); } };
+  let saved = null; try { saved = localStorage.getItem('vd-hu'); } catch (e) { }
+  if (saved === '0' || (saved === null && window.innerWidth < 1700)) { setHU(false); try { localStorage.removeItem('vd-hu'); } catch (e) { } }
+  $('#btnBitacora').onclick = openLog;
+  $('#btnReset').onclick = () => { S = buildState(); ui = { calYear: 2026, calFilters: { period: '', proc: '', status: '' }, calSearch: '', calShowFilters: false, procSel: 'nac', procTab: 'cfg', ruleSet: null, ruleFilterProc: '', errTab: 'cat', errFilters: { cat: '', sev: '' }, roleSel: 'admin', roleTab: 'perms', roleDirty: null, accOpen: { 'vd.adm': true } }; route = 'cal'; initDemobar(); render(); toast('Demo reiniciada.'); };
+}
+initDemobar(); render();
+
+</script>
+</body>
+</html>

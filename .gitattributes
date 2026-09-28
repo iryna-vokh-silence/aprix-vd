@@ -1,0 +1,7 @@
+*.docx  diff=astextplain
+*.pptx  diff=astextplain
+*.xlsx  diff=astextplain
+*.pdf   diff=astextplain
+*.png   binary
+*.jpg   binary
+*.drawio text
